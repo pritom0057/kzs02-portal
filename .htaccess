@@ -1,0 +1,6 @@
+# cPanel root .htaccess — redirects all traffic into Laravel's public/ folder
+# Place this file in your domain's root (e.g. public_html/)
+# and upload the full kzs-portal/ folder alongside it.
+
+RewriteEngine On
+RewriteRule ^(.*)$ public/$1 [L]
