@@ -128,22 +128,51 @@
 
       {{-- T-Shirt Size --}}
       <div class="mb-5">
-        <div class="flex items-center justify-between mb-2">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"><i class="fa-solid fa-shirt text-primary mr-1"></i> Reunion T-Shirt Size <span class="text-brand">*</span></label>
-          <span class="text-xs text-gray-400 dark:text-gray-500">Chest measurement (inches)</span>
+        <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+          <div class="flex flex-col sm:flex-row">
+
+            {{-- T-shirt image --}}
+            <div class="relative sm:w-56 flex-shrink-0 bg-gray-50 dark:bg-gray-700/60 flex items-center justify-center p-4 border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-gray-700">
+              <img src="{{ asset('images/t-shirt.jpg') }}" alt="KZS 2002 Reunion T-Shirt"
+                   class="max-h-44 sm:max-h-52 w-auto object-contain drop-shadow-md">
+              <span class="absolute top-2.5 left-2.5 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wide uppercase">
+                Official Tee
+              </span>
+            </div>
+
+            {{-- Size picker --}}
+            <div class="flex-1 p-4 sm:p-5">
+              <div class="flex items-center justify-between mb-3">
+                <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <i class="fa-solid fa-shirt text-primary mr-1.5"></i>
+                  Reunion T-Shirt Size <span class="text-brand">*</span>
+                </p>
+                <span class="text-[10px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">Chest inches</span>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2">
+                @foreach(['S' => '36"-38"','M' => '38"-40"','L' => '40"-42"','XL' => '42"-44"','XXL' => '44"-46"','XXXL' => '46"-48"'] as $size => $range)
+                <label class="cursor-pointer">
+                  <input type="radio" name="tshirt_size" value="{{ $size }}" class="sr-only peer"
+                    {{ old('tshirt_size', $reg?->tshirt_size ?? 'M') === $size ? 'checked' : '' }}>
+                  <span class="flex flex-col items-center justify-center border-2 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-xl py-2.5 px-1 text-center peer-checked:border-primary peer-checked:bg-primary/5 dark:peer-checked:bg-primary/15 peer-checked:text-primary transition select-none hover:border-gray-300 dark:hover:border-gray-500">
+                    <span class="font-bold text-sm">{{ $size }}</span>
+                    <span class="text-[10px] opacity-70 mt-0.5 leading-tight">{{ $range }}</span>
+                  </span>
+                </label>
+                @endforeach
+              </div>
+
+              @error('tshirt_size') <p class="text-brand text-xs mt-2">{{ $message }}</p> @enderror
+
+              <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-3 leading-relaxed">
+                <i class="fa fa-circle-info mr-1"></i>
+                Sizes are based on chest measurement. If between sizes, choose the larger one.
+              </p>
+            </div>
+
+          </div>
         </div>
-        <div class="flex flex-wrap gap-2">
-          @foreach(['S' => '36"-38"','M' => '38"-40"','L' => '40"-42"','XL' => '42"-44"','XXL' => '44"-46"','XXXL' => '46"-48"'] as $size => $range)
-          <label class="cursor-pointer">
-            <input type="radio" name="tshirt_size" value="{{ $size }}" class="sr-only peer"
-              {{ old('tshirt_size', $reg?->tshirt_size ?? 'M') === $size ? 'checked' : '' }}>
-            <span class="inline-block border-2 border-gray-200 dark:border-gray-600 dark:text-gray-300 rounded-lg px-3 py-2 text-sm font-semibold peer-checked:border-kgreen peer-checked:text-kgreen peer-checked:bg-green-50 dark:peer-checked:bg-green-900/30 transition select-none">
-              {{ $size }} <span class="text-xs font-normal text-gray-400 dark:text-gray-500">{{ $range }}</span>
-            </span>
-          </label>
-          @endforeach
-        </div>
-        @error('tshirt_size') <p class="text-brand text-xs mt-1">{{ $message }}</p> @enderror
       </div>
 
       {{-- Professional --}}
@@ -297,16 +326,16 @@
         <div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-primary flex items-center justify-center"><i class="fa-solid fa-map-location-dot text-sm"></i></div>
         <div>
           <h2 class="text-sm font-bold text-kgray dark:text-gray-200 uppercase tracking-wide">4. Present &amp; Permanent Address</h2>
-          <p class="text-xs text-gray-400 dark:text-gray-500">Complete address with Thana, Upazila, and District</p>
+          <p class="text-xs text-gray-400 dark:text-gray-500">Complete address with Thana, Upazilla, and District</p>
         </div>
       </div>
 
       @php
         // Format: "{road}, PO: {post}, {thana}, PC: {postcode}, {district}"
-        // Also handles legacy "Upazila:" prefix for existing data
+        // Also handles legacy "PC:" / "Upazila:" prefix for existing data
         function parseAddr(string $addr): array {
             $parts = ['road'=>'','post'=>'','thana'=>'','postcode'=>'','district'=>''];
-            if (preg_match('/^(.*?),\s*PO:\s*(.*?),\s*(.*?),\s*(?:PC:|Upazila:)\s*(.*?),\s*(.*)$/', $addr, $m)) {
+            if (preg_match('/^(.*?),\s*PO:\s*(.*?),\s*(.*?),\s*(?:PC:|Upazilla?:)\s*(.*?),\s*(.*)$/', $addr, $m)) {
                 $parts = ['road'=>trim($m[1]),'post'=>trim($m[2]),'thana'=>trim($m[3]),'postcode'=>trim($m[4]),'district'=>trim($m[5])];
             }
             return $parts;
@@ -338,9 +367,9 @@
               class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Post Code <span class="text-brand">*</span></label>
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Upazilla <span class="text-brand">*</span></label>
             <input type="text" name="pres_postcode" required value="{{ old('pres_postcode', $pres['postcode']) }}" id="pres_postcode"
-              placeholder="e.g. 7000"
+              placeholder="e.g. Kushtia Sadar"
               class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
           </div>
           <div class="sm:col-span-2">
@@ -380,9 +409,9 @@
               class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Post Code <span class="text-brand">*</span></label>
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Upazilla <span class="text-brand">*</span></label>
             <input type="text" name="perm_postcode" required value="{{ old('perm_postcode', $perm['postcode']) }}" id="perm_postcode"
-              placeholder="e.g. 7000"
+              placeholder="e.g. Kushtia Sadar"
               class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
           </div>
           <div class="sm:col-span-2">

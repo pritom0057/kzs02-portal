@@ -8,10 +8,15 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DirectoryController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\Payment\PaymentController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReactionController;
+use App\Http\Controllers\WallController;
+use App\Http\Controllers\WallNotificationController;
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -66,6 +71,29 @@ Route::middleware(['auth', 'alumni.verified'])->group(function () {
 
     // Alumni directory
     Route::get('/directory', [DirectoryController::class, 'index'])->name('directory');
+
+    // Wall
+    Route::get('/wall', [WallController::class, 'index'])->name('wall.index');
+    Route::post('/wall', [WallController::class, 'store'])->name('wall.store');
+    Route::get('/wall/poll', [WallController::class, 'poll'])->name('wall.poll');
+    Route::get('/wall/post/{post}', [WallController::class, 'goToPost'])->name('wall.go-to-post');
+    Route::get('/wall/search-alumni', [WallController::class, 'searchAlumni'])->name('wall.search');
+    Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::patch('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    Route::post('/posts/{post}/react', [ReactionController::class, 'togglePost'])->name('posts.react');
+    Route::post('/comments/{comment}/react', [ReactionController::class, 'toggleComment'])->name('comments.react');
+    Route::get('/posts/{post}/reactions', [ReactionController::class, 'listPost'])->name('posts.reactions.list');
+    Route::get('/comments/{comment}/reactions', [ReactionController::class, 'listComment'])->name('comments.reactions.list');
+
+    // Wall notifications
+    Route::get('/wall/notifications', [WallNotificationController::class, 'index'])->name('wall.notifications');
+    Route::post('/wall/notifications/read', [WallNotificationController::class, 'markRead'])->name('wall.notifications.read');
+
+    // Theme preference
+    Route::post('/settings/theme', [ProfileController::class, 'saveTheme'])->name('settings.theme');
 
     // Payment
     Route::get('/payment/confirm', [PaymentController::class, 'confirm'])->name('payment.confirm');

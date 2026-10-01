@@ -60,7 +60,7 @@ class ProfileController extends Controller
             $request->input("{$pre}_road"),
             $request->input("{$pre}_post")     ? 'PO: ' . $request->input("{$pre}_post")     : null,
             $request->input("{$pre}_thana"),
-            $request->input("{$pre}_postcode") ? 'PC: ' . $request->input("{$pre}_postcode") : null,
+            $request->input("{$pre}_postcode") ? 'Upazilla: ' . $request->input("{$pre}_postcode") : null,
             $request->input("{$pre}_district"),
         ])) ?: null;
 
@@ -85,5 +85,12 @@ class ProfileController extends Controller
         $alumni->update($data);
 
         return redirect()->route('profile.show')->with('success', 'Profile updated successfully.');
+    }
+
+    public function saveTheme(Request $request)
+    {
+        $request->validate(['theme' => 'required|in:light,dark,auto']);
+        auth()->user()->update(['theme' => $request->theme]);
+        return response()->json(['success' => true]);
     }
 }
