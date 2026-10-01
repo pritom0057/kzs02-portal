@@ -82,7 +82,7 @@
         @php
             function parseAddrProfile(string $addr): array {
                 $p = ['road'=>'','post'=>'','thana'=>'','postcode'=>'','district'=>''];
-                if (preg_match('/^(.*?),\s*PO:\s*(.*?),\s*(.*?),\s*(?:PC:|Upazila:)\s*(.*?),\s*(.*)$/', $addr, $m)) {
+                if (preg_match('/^(.*?),\s*PO:\s*(.*?),\s*(.*?),\s*(?:PC:|Upazilla?:)\s*(.*?),\s*(.*)$/', $addr, $m)) {
                     $p = ['road'=>trim($m[1]),'post'=>trim($m[2]),'thana'=>trim($m[3]),'postcode'=>trim($m[4]),'district'=>trim($m[5])];
                 }
                 return $p;
@@ -114,8 +114,8 @@
                         class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-kgray dark:text-gray-400 mb-1">Post Code</label>
-                    <input type="text" name="pres_postcode" id="prof_pres_postcode" value="{{ $pres['postcode'] }}" placeholder="e.g. 7000"
+                    <label class="block text-xs font-medium text-kgray dark:text-gray-400 mb-1">Upazilla</label>
+                    <input type="text" name="pres_postcode" id="prof_pres_postcode" value="{{ $pres['postcode'] }}" placeholder="e.g. Kushtia Sadar"
                         class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
                 </div>
                 <div class="sm:col-span-2">
@@ -149,8 +149,8 @@
                         class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-kgray dark:text-gray-400 mb-1">Post Code</label>
-                    <input type="text" name="perm_postcode" id="prof_perm_postcode" value="{{ $perm['postcode'] }}" placeholder="e.g. 7000"
+                    <label class="block text-xs font-medium text-kgray dark:text-gray-400 mb-1">Upazilla</label>
+                    <input type="text" name="perm_postcode" id="prof_perm_postcode" value="{{ $perm['postcode'] }}" placeholder="e.g. Kushtia Sadar"
                         class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
                 </div>
                 <div class="sm:col-span-2">

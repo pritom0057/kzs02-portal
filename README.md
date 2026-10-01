@@ -17,7 +17,13 @@ Live site: **https://www.kzs02.com**
   - Online: SSLCommerz payment gateway
 - **Admin Panel** — Verify/reject alumni, confirm/reset/adjust payments, add notes, full audit log, CSV exports
 - **Alumni Directory** — Grid/list view with dark mode support
-- **Dark Mode** — Class-based, persisted via localStorage
+- **Dark Mode** — Class-based, synced to DB per user (light / dark / auto)
+- **Alumni Wall** — Social feed with posts, photos, @mentions, inline tag-all, reactions, comments, replies
+  - Live polling (5 s) for new posts and comments, new-post banner, infinite scroll
+  - Like / Dislike with reactor list (who liked / who disliked modal)
+  - Post and comment editing with (Edited) indicator
+  - Date filter: All Time / This Month / This Week
+- **Wall Notifications** — Bell icon in navbar; notified on tag, comment, reply, like, dislike; click navigates to the post
 
 ---
 
@@ -31,6 +37,7 @@ Live site: **https://www.kzs02.com**
 | Auth | Email OTP verification |
 | Payment | SSLCommerz + manual (bKash / Nagad / Bank) |
 | Hosting | cPanel shared hosting |
+| Realtime | 5-second AJAX polling (no WebSockets needed) |
 
 ---
 
@@ -125,6 +132,39 @@ SSLCZ_IS_SANDBOX=false
 | `/admin/registrations` | All registrations with balance due |
 | `/admin/export/alumni` | CSV export |
 | `/admin/export/registrations` | CSV export |
+
+---
+
+## Wall Routes
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/wall` | Feed with date filter + pagination |
+| POST | `/wall` | Create new post (photo + @mentions + tags) |
+| GET | `/wall/poll` | Polling endpoint — new posts, comments, notif count |
+| GET | `/wall/post/{post}` | Navigate to specific post (from notification) |
+| PATCH | `/posts/{post}` | Edit own post |
+| DELETE | `/posts/{post}` | Delete own post (admin can delete any) |
+| POST | `/posts/{post}/comments` | Add comment or reply |
+| PATCH | `/comments/{comment}` | Edit own comment/reply |
+| DELETE | `/comments/{comment}` | Delete comment (admin can delete any) |
+| POST | `/posts/{post}/react` | Like / Dislike a post |
+| POST | `/comments/{comment}/react` | Like / Dislike a comment |
+| GET | `/posts/{post}/reactions` | List reactors (who liked / disliked) |
+| GET | `/comments/{comment}/reactions` | List reactors for a comment |
+| GET | `/wall/notifications` | Fetch notifications (marks all read) |
+| POST | `/wall/notifications/read` | Mark all notifications read |
+| POST | `/settings/theme` | Save theme preference to DB |
+
+---
+
+## Database Notes
+
+- All foreign keys on the `alumni` table use `->references('id')->on('alumni')` — the table name is `alumni`, not `alumnis`
+- Reactions use a polymorphic `morphMany` — shared between posts and comments
+- Wall notifications are created on tag, comment, reply, like, and dislike events
+- Address is stored as a combined string: `"Road, PO: PostOffice, Thana, Upazilla: Upazilla, District"` — parsed by regex in views
+- Photo URL resolution: paths starting with `uploads/` use `asset()` directly; others use `asset('storage/'.$url)`
 
 ---
 

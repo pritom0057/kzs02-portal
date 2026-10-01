@@ -86,7 +86,7 @@ class EventRegistrationController extends Controller
             $request->pres_road,
             'PO: ' . $request->pres_post,
             $request->pres_thana,
-            'PC: ' . $request->pres_postcode,
+            'Upazilla: ' . $request->pres_postcode,
             $request->pres_district,
         ]));
 
@@ -94,7 +94,7 @@ class EventRegistrationController extends Controller
             $request->perm_road,
             'PO: ' . $request->perm_post,
             $request->perm_thana,
-            'PC: ' . $request->perm_postcode,
+            'Upazilla: ' . $request->perm_postcode,
             $request->perm_district,
         ]));
 
