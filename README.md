@@ -13,11 +13,12 @@ Live site: **https://www.kzs02.com**
 - **Event Registration** — T-shirt size, family/guest details, driver entry, donation — with live fee calculator
 - **Bidirectional Data Sync** — Profile and event registration share spouse name, address, mobile, school info, emergency contact
 - **Payment Collection**
-  - Manual: bKash, Nagad, bank transfer (alumni submits transaction ID, admin confirms)
-  - Online: SSLCommerz payment gateway
+  - Manual: bKash, Nagad, Rocket, bank transfer (alumni submits transaction ID, admin confirms)
 - **Admin Panel** — Verify/reject alumni, confirm/reset/adjust payments, add notes, full audit log, CSV exports
 - **Alumni Directory** — Grid/list view with dark mode support
-- **Dark Mode** — Class-based, synced to DB per user (light / dark / auto)
+- **Dark Mode** — Class-based, synced to DB per user (light / dark / auto); public pages default to light
+- **Language Toggle** — Bengali / English with preference saved to DB per user
+- **Mobile Responsive** — Burger menu on mobile, responsive grids throughout registration and profile forms
 - **Alumni Wall** — Social feed with posts, photos, @mentions, inline tag-all, reactions, comments, replies
   - Live polling (5 s) for new posts and comments, new-post banner, infinite scroll
   - Like / Dislike with reactor list (who liked / who disliked modal)
@@ -35,7 +36,7 @@ Live site: **https://www.kzs02.com**
 | Frontend | Blade templates, Tailwind CSS (CDN), Font Awesome |
 | Database | MySQL (cPanel shared hosting) |
 | Auth | Email OTP verification |
-| Payment | SSLCommerz + manual (bKash / Nagad / Bank) |
+| Payment | Manual (bKash / Nagad / Rocket / Bank) |
 | Hosting | cPanel shared hosting |
 | Realtime | 5-second AJAX polling (no WebSockets needed) |
 
@@ -116,10 +117,6 @@ SSLCZ_IS_SANDBOX=false
 2. Admin reviews and confirms → status set to `paid`, `paid_amount` updated
 3. Admin can reset or adjust if guests/amounts change
 
-**SSLCommerz (Online)**
-1. Alumni clicks Online → redirected to SSLCommerz gateway
-2. On success, IPN callback updates `paid_amount` and logs `ssl_confirmed`
-
 ---
 
 ## Admin Routes
@@ -155,6 +152,7 @@ SSLCZ_IS_SANDBOX=false
 | GET | `/wall/notifications` | Fetch notifications (marks all read) |
 | POST | `/wall/notifications/read` | Mark all notifications read |
 | POST | `/settings/theme` | Save theme preference to DB |
+| POST | `/settings/lang` | Save language preference to DB |
 
 ---
 
@@ -165,6 +163,8 @@ SSLCZ_IS_SANDBOX=false
 - Wall notifications are created on tag, comment, reply, like, and dislike events
 - Address is stored as a combined string: `"Road, PO: PostOffice, Thana, Upazilla: Upazilla, District"` — parsed by regex in views
 - Photo URL resolution: paths starting with `uploads/` use `asset()` directly; others use `asset('storage/'.$url)`
+- `alumni.lang` column stores language preference (`bn` / `en`), added via migration `2026_10_03_000001_add_lang_to_alumni_table.php`
+- `alumni.theme` column stores theme preference (`light` / `dark` / `auto`)
 
 ---
 
