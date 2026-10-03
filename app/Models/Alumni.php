@@ -22,7 +22,7 @@ class Alumni extends Authenticatable
         'spouse_name', 'spouse_contact', 'children',
         'facebook_url', 'linkedin_url',
         'show_in_directory',
-        'status', 'role', 'theme', 'email_verified',
+        'status', 'role', 'theme', 'lang', 'email_verified',
     ];
 
     protected $hidden = ['password', 'remember_token'];
