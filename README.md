@@ -112,7 +112,7 @@ SSLCZ_IS_SANDBOX=false
 
 ## Payment Flow
 
-**Manual (bKash / Nagad / Bank Transfer)**
+**Manual (bKash / Nagad / Rocket / Bank Transfer)**
 1. Alumni submits transaction reference → status set to `pending`
 2. Admin reviews and confirms → status set to `paid`, `paid_amount` updated
 3. Admin can reset or adjust if guests/amounts change
