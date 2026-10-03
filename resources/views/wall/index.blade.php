@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Alumni Wall — KZS 2002 Reunion')
+@section('title', 'ব্যাচ ওয়াল — KZS 2002')
 @section('content')
 
 @php
@@ -7,577 +7,526 @@
     $myPhoto = $me->photo_url
         ? (str_starts_with($me->photo_url, 'uploads/') ? asset($me->photo_url) : asset('storage/' . $me->photo_url))
         : null;
+    $myInitial = strtoupper(substr($me->name, 0, 1));
 @endphp
 
-<div class="max-w-2xl mx-auto">
+<div class="m-main">
+<div class="wrap">
+<div class="col" style="margin-inline:auto">
 
-    {{-- Page heading --}}
-    <div class="flex items-center justify-between mb-5">
-        <h1 class="text-xl font-bold text-primary"><i class="fa-solid fa-users-line mr-2"></i>Alumni Wall</h1>
-        <p class="text-xs text-gray-400 dark:text-gray-500">Share memories with your batch</p>
-    </div>
-
-    {{-- New posts banner (shown by polling JS) --}}
-    <div id="newPostsBanner" class="hidden mb-4 bg-primary/10 dark:bg-primary/20 border border-primary/30 rounded-xl px-4 py-2.5 flex items-center justify-between gap-3">
-        <span class="text-sm text-primary font-medium">
-            <i class="fa fa-arrow-up mr-1.5"></i>
-            <span id="newPostsCount">0</span> new post(s) — click to refresh
-        </span>
-        <button onclick="loadNewPosts()" class="bg-primary text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-red-700 transition">
-            Refresh
-        </button>
-    </div>
-
-    {{-- ================================================================
-         COMPOSER CARD
-    ================================================================ --}}
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 mb-6">
-        <form action="{{ route('wall.store') }}" method="POST" enctype="multipart/form-data" id="postForm">
-            @csrf
-            <div class="flex gap-3">
-                {{-- My avatar --}}
-                <div class="flex-shrink-0">
-                    @if($myPhoto)
-                        <img src="{{ $myPhoto }}" alt="{{ $me->name }}"
-                             class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/30">
-                    @else
-                        <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
-                            {{ strtoupper(substr($me->name, 0, 1)) }}
-                        </div>
-                    @endif
-                </div>
-
-                {{-- Composer body --}}
-                <div class="flex-1 min-w-0">
-                    <div class="relative">
-                        <textarea id="postContent" name="content" rows="3"
-                            placeholder="What's on your mind, {{ $me->name }}? Type @ to mention someone…"
-                            maxlength="1000"
-                            oninput="updatePostBtn(); handleMentionInput(this)"
-                            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none transition"></textarea>
-                        <div id="mentionDropdown"
-                             class="hidden absolute z-30 left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-xl overflow-hidden max-h-48 overflow-y-auto"></div>
-                    </div>
-
-                    {{-- Character counter --}}
-                    <div class="flex justify-end mt-0.5 mb-2">
-                        <span id="charCounter" class="text-xs text-gray-400 dark:text-gray-500">0 / 1000</span>
-                    </div>
-
-                    {{-- Photo preview --}}
-                    <div id="photoPreviewWrap" class="hidden mb-2 relative inline-block">
-                        <img id="photoPreview" src="" alt="Preview"
-                             class="h-32 rounded-lg object-cover border border-gray-200 dark:border-gray-600">
-                        <button type="button" onclick="clearWallPhoto()"
-                            class="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white rounded-full text-xs flex items-center justify-center hover:bg-red-700 transition">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
-
-                    {{-- Tag chips --}}
-                    <div id="tagChips" class="flex flex-wrap gap-1.5 mb-2"></div>
-
-                    {{-- Hidden tagged_ids --}}
-                    <input type="hidden" name="tagged_ids" id="taggedIds" value="">
-
-                    {{-- Tag people input --}}
-                    <div class="relative mb-3" id="tagInputWrap">
-                        <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-1.5">
-                            <i class="fa fa-tag text-gray-400 text-xs"></i>
-                            <input type="text" id="tagInput" placeholder="Tag a classmate…"
-                                autocomplete="off"
-                                oninput="searchTags(this.value)"
-                                onfocus="searchTags(this.value)"
-                                class="flex-1 bg-transparent text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none">
-                        </div>
-                        <div id="tagDropdown"
-                             class="hidden absolute z-20 left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg overflow-hidden">
-                        </div>
-                    </div>
-
-                    {{-- Action bar --}}
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            {{-- Photo upload button --}}
-                            <button type="button" onclick="document.getElementById('wallPhotoInput').click()"
-                                class="flex items-center gap-1.5 text-sm text-kgray dark:text-gray-400 hover:text-kgreen transition px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <i class="fa fa-image text-kgreen"></i>
-                                <span>Photo</span>
-                            </button>
-                            <input type="file" id="wallPhotoInput" name="photo" accept="image/*"
-                                   class="hidden" onchange="previewWallPhoto(this)">
-                        </div>
-
-                        {{-- Submit --}}
-                        <button type="submit" id="postSubmitBtn"
-                            class="bg-primary text-white text-sm font-semibold px-5 py-1.5 rounded-xl hover:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
-                            disabled>
-                            <i class="fa fa-paper-plane mr-1"></i> Post
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    {{-- Filter bar --}}
-    <div class="flex items-center gap-2 mb-4 flex-wrap">
-        <span class="text-xs text-gray-400 dark:text-gray-500 mr-1">Show:</span>
-        @foreach(['all' => 'All Time', 'month' => 'This Month', 'week' => 'This Week'] as $val => $label)
-        <a href="{{ route('wall.index', ['filter' => $val]) }}"
-           class="text-xs px-3 py-1.5 rounded-full font-medium border transition
-               {{ $filter === $val
-                   ? 'bg-primary text-white border-primary'
-                   : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-primary hover:text-primary' }}">
-            {{ $label }}
-        </a>
-        @endforeach
-    </div>
-
-    {{-- ================================================================
-         FEED
-    ================================================================ --}}
-    <div id="post-feed">
-    @forelse($posts as $post)
-    @php
-        $authorPhoto = $post->alumni->photo_url
-            ? (str_starts_with($post->alumni->photo_url, 'uploads/')
-                ? asset($post->alumni->photo_url)
-                : asset('storage/' . $post->alumni->photo_url))
-            : null;
-        $userReaction = $post->reactions->where('alumni_id', $me->id)->first()?->type;
-        $likes        = $post->reactions->where('type', 'like')->count();
-        $dislikes     = $post->reactions->where('type', 'dislike')->count();
-        $commentCount = $post->allComments()->count();
-        $tagNames     = $post->tags->pluck('name');
-    @endphp
-
-    <div id="post-{{ $post->id }}"
-         class="post-card bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-5 overflow-hidden transition-all duration-300">
-
-        {{-- Post header --}}
-        <div class="flex items-start gap-3 p-4 pb-2">
-            {{-- Author avatar --}}
-            <div class="flex-shrink-0">
-                @if($authorPhoto)
-                    <img src="{{ $authorPhoto }}" alt="{{ $post->alumni->name }}"
-                         class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/20">
-                @else
-                    <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
-                        {{ strtoupper(substr($post->alumni->name, 0, 1)) }}
-                    </div>
-                @endif
-            </div>
-
-            {{-- Author info --}}
-            <div class="flex-1 min-w-0">
-                <div class="flex items-start justify-between gap-2">
-                    <div>
-                        <span class="font-semibold text-gray-800 dark:text-gray-100 text-sm">{{ $post->alumni->name }}</span>
-                        @if($tagNames->isNotEmpty())
-                            <span class="text-gray-400 dark:text-gray-500 text-xs">
-                                — with {{ $tagNames->implode(', ') }}
-                            </span>
-                        @endif
-                        <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-1.5">
-                            {{ $post->created_at->diffForHumans() }}
-                            @if($post->updated_at->gt($post->created_at))
-                            <span id="post-edited-label-{{ $post->id }}" class="text-gray-300 dark:text-gray-600 italic">(Edited)</span>
-                            @else
-                            <span id="post-edited-label-{{ $post->id }}" class="hidden text-gray-300 dark:text-gray-600 italic">(Edited)</span>
-                            @endif
-                        </div>
-                    </div>
-
-                    {{-- Edit / Delete (own post or admin) --}}
-                    @if($post->alumni_id === $me->id || $me->isAdmin())
-                    <div class="flex items-center gap-1">
-                        @if($post->alumni_id === $me->id && $post->content)
-                        <button onclick="toggleEditPost({{ $post->id }})"
-                            class="text-gray-300 dark:text-gray-600 hover:text-blue-500 transition text-xs p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                            title="Edit post">
-                            <i class="fa fa-pen-to-square"></i>
-                        </button>
-                        @endif
-                        <button onclick="deletePost({{ $post->id }})"
-                            class="text-gray-300 dark:text-gray-600 hover:text-primary transition text-xs p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                            title="Delete post">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        {{-- Post content --}}
-        @if($post->content)
-        <div id="post-content-{{ $post->id }}" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 leading-relaxed">
-            @if(strlen($post->content) > 200)
-                <span class="post-text-short">{{ substr($post->content, 0, 200) }}<span class="text-gray-400">…</span>
-                    <button onclick="expandPost(this)" class="text-primary text-xs font-semibold ml-1 hover:underline">See more</button>
-                </span>
-                <span class="post-text-full hidden" data-full="{{ $post->content }}">{{ $post->content }}
-                    <button onclick="collapsePost(this)" class="text-primary text-xs font-semibold ml-1 hover:underline">See less</button>
-                </span>
-            @else
-                {{ $post->content }}
-            @endif
-        </div>
-        @endif
-
-        {{-- Inline edit form (hidden) --}}
-        @if($post->alumni_id === $me->id && $post->content)
-        <div id="post-edit-form-{{ $post->id }}" class="hidden px-4 pb-3">
-            <textarea id="post-edit-input-{{ $post->id }}" rows="3" maxlength="1000"
-                class="w-full bg-gray-50 dark:bg-gray-700 border border-primary/40 rounded-xl px-3 py-2 text-sm text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none transition">{{ $post->content }}</textarea>
-            <div class="flex items-center gap-2 mt-2 justify-end">
-                <button onclick="cancelEditPost({{ $post->id }})"
-                    class="text-xs text-gray-400 hover:text-gray-600 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 transition">Cancel</button>
-                <button onclick="saveEditPost({{ $post->id }})"
-                    class="text-xs bg-primary text-white px-3 py-1.5 rounded-lg hover:bg-red-700 transition font-semibold">Save</button>
-            </div>
-        </div>
-        @endif
-
-        {{-- Post photo --}}
-        @if($post->photo_url)
-        <div class="mt-1">
-            <img src="{{ asset($post->photo_url) }}" alt="Post photo"
-                 class="w-full max-h-96 object-cover">
-        </div>
-        @endif
-
-        {{-- Reaction counts summary --}}
-        <div class="px-4 pt-2 pb-1 flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
-            <button onclick="showReactors('post', {{ $post->id }}, 'like')"
-                id="post-likes-summary-{{ $post->id }}"
-                class="{{ $likes > 0 ? '' : 'hidden' }} hover:underline cursor-pointer transition">{{ $likes > 0 ? $likes : 0 }} 👍</button>
-            <button onclick="showReactors('post', {{ $post->id }}, 'dislike')"
-                id="post-dislikes-summary-{{ $post->id }}"
-                class="{{ $dislikes > 0 ? '' : 'hidden' }} hover:underline cursor-pointer transition">{{ $dislikes > 0 ? $dislikes : 0 }} 👎</button>
-            <span id="post-comment-count-{{ $post->id }}" class="{{ $commentCount > 0 ? '' : 'hidden' }}">{{ $commentCount > 0 ? $commentCount : 0 }} 💬</span>
-        </div>
-
-        {{-- Divider --}}
-        <div class="mx-4 border-t border-gray-100 dark:border-gray-700"></div>
-
-        {{-- Action bar --}}
-        <div class="grid grid-cols-3 divide-x divide-gray-100 dark:divide-gray-700">
-            {{-- Like --}}
-            <button data-post="{{ $post->id }}" data-type="like"
-                onclick="reactPost(this)"
-                id="btn-like-{{ $post->id }}"
-                class="flex items-center justify-center gap-1.5 py-2 text-sm font-medium transition hover:bg-gray-50 dark:hover:bg-gray-700 rounded-bl-2xl
-                    {{ $userReaction === 'like' ? 'text-kgreen' : 'text-kgray dark:text-gray-400' }}">
-                <i class="fa fa-thumbs-up"></i>
-                <span id="post-like-count-{{ $post->id }}">{{ $likes > 0 ? $likes : '' }}</span>
-                Like
-            </button>
-
-            {{-- Dislike --}}
-            <button data-post="{{ $post->id }}" data-type="dislike"
-                onclick="reactPost(this)"
-                id="btn-dislike-{{ $post->id }}"
-                class="flex items-center justify-center gap-1.5 py-2 text-sm font-medium transition hover:bg-gray-50 dark:hover:bg-gray-700
-                    {{ $userReaction === 'dislike' ? 'text-primary' : 'text-kgray dark:text-gray-400' }}">
-                <i class="fa fa-thumbs-down"></i>
-                <span id="post-dislike-count-{{ $post->id }}">{{ $dislikes > 0 ? $dislikes : '' }}</span>
-                Dislike
-            </button>
-
-            {{-- Comment toggle --}}
-            <button onclick="toggleComments({{ $post->id }})"
-                id="btn-comment-{{ $post->id }}"
-                class="flex items-center justify-center gap-1.5 py-2 text-sm font-medium text-kgray dark:text-gray-400 transition hover:bg-gray-50 dark:hover:bg-gray-700 rounded-br-2xl">
-                <i class="fa fa-comment"></i>
-                <span id="btn-comment-count-{{ $post->id }}" class="{{ $commentCount > 0 ? 'font-bold' : 'hidden' }}">{{ $commentCount > 0 ? $commentCount : '' }}</span>
-                Comment
-            </button>
-        </div>
-
-        {{-- ============================================================
-             COMMENTS SECTION
-        ============================================================ --}}
-        <div id="comments-{{ $post->id }}" class="hidden border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 rounded-b-2xl px-4 py-3">
-
-            {{-- Existing comments --}}
-            <div id="comment-list-{{ $post->id }}" class="space-y-3 mb-3">
-                @foreach($post->comments as $comment)
-                @php
-                    $cPhoto = $comment->alumni->photo_url
-                        ? (str_starts_with($comment->alumni->photo_url, 'uploads/')
-                            ? asset($comment->alumni->photo_url)
-                            : asset('storage/' . $comment->alumni->photo_url))
-                        : null;
-                    $cLikes    = $comment->reactions->where('type','like')->count();
-                    $cDislikes = $comment->reactions->where('type','dislike')->count();
-                    $cUserRxn  = $comment->reactions->where('alumni_id', $me->id)->first()?->type;
-                @endphp
-
-                <div id="comment-{{ $comment->id }}" class="flex gap-2.5">
-                    {{-- Avatar --}}
-                    <div class="flex-shrink-0">
-                        @if($cPhoto)
-                            <img src="{{ $cPhoto }}" alt="{{ $comment->alumni->name }}"
-                                 class="w-8 h-8 rounded-full object-cover ring-1 ring-primary/20">
-                        @else
-                            <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
-                                {{ strtoupper(substr($comment->alumni->name, 0, 1)) }}
-                            </div>
-                        @endif
-                    </div>
-
-                    <div class="flex-1 min-w-0">
-                        {{-- Comment bubble --}}
-                        <div class="bg-white dark:bg-gray-800 rounded-xl px-3 py-2 text-sm shadow-sm border border-gray-100 dark:border-gray-700">
-                            <div class="flex items-start justify-between gap-2">
-                                <span class="font-semibold text-gray-800 dark:text-gray-100 text-xs">{{ $comment->alumni->name }}</span>
-                                <div class="flex items-center gap-1">
-                                    @if($comment->alumni_id === $me->id)
-                                    <button onclick="toggleEditComment({{ $comment->id }})"
-                                        class="text-gray-300 dark:text-gray-600 hover:text-blue-500 text-xs transition" title="Edit">
-                                        <i class="fa fa-pen-to-square"></i>
-                                    </button>
-                                    @endif
-                                    @if($comment->alumni_id === $me->id || $me->isAdmin())
-                                    <button onclick="deleteComment({{ $comment->id }})"
-                                        class="text-gray-300 dark:text-gray-600 hover:text-primary text-xs transition">
-                                        <i class="fa fa-times"></i>
-                                    </button>
-                                    @endif
-                                </div>
-                            </div>
-                            <p id="comment-text-{{ $comment->id }}" class="text-gray-700 dark:text-gray-200 mt-0.5 break-words">{{ $comment->content }}</p>
-                        </div>
-
-                        {{-- Inline comment edit form --}}
-                        @if($comment->alumni_id === $me->id)
-                        <div id="comment-edit-form-{{ $comment->id }}" class="hidden mt-1">
-                            <textarea id="comment-edit-input-{{ $comment->id }}" rows="2" maxlength="500"
-                                class="w-full bg-white dark:bg-gray-800 border border-primary/40 rounded-xl px-3 py-2 text-sm text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none transition">{{ $comment->content }}</textarea>
-                            <div class="flex items-center gap-2 mt-1 justify-end">
-                                <button onclick="cancelEditComment({{ $comment->id }})" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-600 transition">Cancel</button>
-                                <button onclick="saveEditComment({{ $comment->id }})" class="text-xs bg-primary text-white px-2 py-1 rounded-lg hover:bg-red-700 transition font-semibold">Save</button>
-                            </div>
-                        </div>
-                        @endif
-
-                        {{-- Comment meta --}}
-                        <div class="flex items-center gap-3 mt-1 px-1">
-                            <span class="text-xs text-gray-400">{{ $comment->created_at->diffForHumans() }}</span>
-                            <span id="comment-edited-{{ $comment->id }}" class="{{ $comment->updated_at->gt($comment->created_at) ? '' : 'hidden' }} text-xs text-gray-300 dark:text-gray-600 italic">(Edited)</span>
-                            {{-- Like comment --}}
-                            <button data-comment="{{ $comment->id }}" data-type="like"
-                                onclick="reactComment(this)"
-                                id="cbtn-like-{{ $comment->id }}"
-                                class="text-xs font-medium transition
-                                    {{ $cUserRxn === 'like' ? 'text-kgreen' : 'text-gray-400 hover:text-kgreen' }}">
-                                <i class="fa fa-thumbs-up"></i>
-                                <span id="c-like-count-{{ $comment->id }}">{{ $cLikes > 0 ? $cLikes : '' }}</span>
-                            </button>
-                            {{-- Dislike comment --}}
-                            <button data-comment="{{ $comment->id }}" data-type="dislike"
-                                onclick="reactComment(this)"
-                                id="cbtn-dislike-{{ $comment->id }}"
-                                class="text-xs font-medium transition
-                                    {{ $cUserRxn === 'dislike' ? 'text-primary' : 'text-gray-400 hover:text-primary' }}">
-                                <i class="fa fa-thumbs-down"></i>
-                                <span id="c-dislike-count-{{ $comment->id }}">{{ $cDislikes > 0 ? $cDislikes : '' }}</span>
-                            </button>
-                            {{-- Reply --}}
-                            <button onclick="toggleReply({{ $comment->id }}, {{ $post->id }})"
-                                class="text-xs text-gray-400 hover:text-primary transition font-medium">
-                                Reply
-                            </button>
-                        </div>
-
-                        {{-- Reply form (hidden) --}}
-                        <div id="reply-form-{{ $comment->id }}" class="hidden mt-2">
-                            <div class="flex gap-2">
-                                <div class="flex-shrink-0">
-                                    @if($myPhoto)
-                                        <img src="{{ $myPhoto }}" class="w-7 h-7 rounded-full object-cover">
-                                    @else
-                                        <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
-                                            {{ strtoupper(substr($me->name, 0, 1)) }}
-                                        </div>
-                                    @endif
-                                </div>
-                                <div class="flex-1 flex gap-2">
-                                    <input type="text"
-                                        id="reply-input-{{ $comment->id }}"
-                                        placeholder="Write a reply…"
-                                        maxlength="500"
-                                        class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-1.5 text-xs text-gray-700 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 transition">
-                                    <button onclick="submitReply({{ $comment->id }}, {{ $post->id }})"
-                                        class="bg-primary text-white text-xs px-3 py-1.5 rounded-xl hover:bg-red-700 transition">
-                                        <i class="fa fa-paper-plane"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Replies --}}
-                        @if($comment->replies->isNotEmpty())
-                        <div id="replies-{{ $comment->id }}" class="mt-2 ml-10 space-y-2">
-                            @foreach($comment->replies as $reply)
-                            @php
-                                $rPhoto = $reply->alumni->photo_url
-                                    ? (str_starts_with($reply->alumni->photo_url, 'uploads/')
-                                        ? asset($reply->alumni->photo_url)
-                                        : asset('storage/' . $reply->alumni->photo_url))
-                                    : null;
-                                $rLikes    = $reply->reactions->where('type','like')->count();
-                                $rDislikes = $reply->reactions->where('type','dislike')->count();
-                                $rUserRxn  = $reply->reactions->where('alumni_id', $me->id)->first()?->type;
-                            @endphp
-                            <div id="comment-{{ $reply->id }}" class="flex gap-2">
-                                <div class="flex-shrink-0">
-                                    @if($rPhoto)
-                                        <img src="{{ $rPhoto }}" alt="{{ $reply->alumni->name }}"
-                                             class="w-7 h-7 rounded-full object-cover ring-1 ring-primary/20">
-                                    @else
-                                        <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
-                                            {{ strtoupper(substr($reply->alumni->name, 0, 1)) }}
-                                        </div>
-                                    @endif
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="bg-white dark:bg-gray-800 rounded-xl px-3 py-2 text-sm shadow-sm border border-gray-100 dark:border-gray-700">
-                                        <div class="flex items-start justify-between gap-2">
-                                            <span class="font-semibold text-gray-800 dark:text-gray-100 text-xs">{{ $reply->alumni->name }}</span>
-                                            <div class="flex items-center gap-1">
-                                                @if($reply->alumni_id === $me->id)
-                                                <button onclick="toggleEditComment({{ $reply->id }})"
-                                                    class="text-gray-300 dark:text-gray-600 hover:text-blue-500 text-xs transition" title="Edit">
-                                                    <i class="fa fa-pen-to-square"></i>
-                                                </button>
-                                                @endif
-                                                @if($reply->alumni_id === $me->id || $me->isAdmin())
-                                                <button onclick="deleteComment({{ $reply->id }})"
-                                                    class="text-gray-300 dark:text-gray-600 hover:text-primary text-xs transition">
-                                                    <i class="fa fa-times"></i>
-                                                </button>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <p id="comment-text-{{ $reply->id }}" class="text-gray-700 dark:text-gray-200 mt-0.5 break-words text-xs">{{ $reply->content }}</p>
-                                    </div>
-                                    @if($reply->alumni_id === $me->id)
-                                    <div id="comment-edit-form-{{ $reply->id }}" class="hidden mt-1">
-                                        <textarea id="comment-edit-input-{{ $reply->id }}" rows="2" maxlength="500"
-                                            class="w-full bg-white dark:bg-gray-800 border border-primary/40 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none transition">{{ $reply->content }}</textarea>
-                                        <div class="flex items-center gap-2 mt-1 justify-end">
-                                            <button onclick="cancelEditComment({{ $reply->id }})" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-600 transition">Cancel</button>
-                                            <button onclick="saveEditComment({{ $reply->id }})" class="text-xs bg-primary text-white px-2 py-1 rounded-lg hover:bg-red-700 transition font-semibold">Save</button>
-                                        </div>
-                                    </div>
-                                    @endif
-                                    <div class="flex items-center gap-3 mt-1 px-1">
-                                        <span class="text-xs text-gray-400">{{ $reply->created_at->diffForHumans() }}</span>
-                                        <span id="comment-edited-{{ $reply->id }}" class="{{ $reply->updated_at->gt($reply->created_at) ? '' : 'hidden' }} text-xs text-gray-300 dark:text-gray-600 italic">(Edited)</span>
-                                        <button data-comment="{{ $reply->id }}" data-type="like"
-                                            onclick="reactComment(this)"
-                                            id="cbtn-like-{{ $reply->id }}"
-                                            class="text-xs font-medium transition
-                                                {{ $rUserRxn === 'like' ? 'text-kgreen' : 'text-gray-400 hover:text-kgreen' }}">
-                                            <i class="fa fa-thumbs-up"></i>
-                                            <span id="c-like-count-{{ $reply->id }}">{{ $rLikes > 0 ? $rLikes : '' }}</span>
-                                        </button>
-                                        <button data-comment="{{ $reply->id }}" data-type="dislike"
-                                            onclick="reactComment(this)"
-                                            id="cbtn-dislike-{{ $reply->id }}"
-                                            class="text-xs font-medium transition
-                                                {{ $rUserRxn === 'dislike' ? 'text-primary' : 'text-gray-400 hover:text-primary' }}">
-                                            <i class="fa fa-thumbs-down"></i>
-                                            <span id="c-dislike-count-{{ $reply->id }}">{{ $rDislikes > 0 ? $rDislikes : '' }}</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                        @else
-                        <div id="replies-{{ $comment->id }}" class="mt-2 ml-10 space-y-2"></div>
-                        @endif
-
-                    </div>
-                </div>
-                @endforeach
-            </div>
-
-            {{-- Add comment form --}}
-            <div id="comment-form-{{ $post->id }}" class="flex gap-2.5">
-                <div class="flex-shrink-0">
-                    @if($myPhoto)
-                        <img src="{{ $myPhoto }}" class="w-8 h-8 rounded-full object-cover">
-                    @else
-                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
-                            {{ strtoupper(substr($me->name, 0, 1)) }}
-                        </div>
-                    @endif
-                </div>
-                <div class="flex-1 flex gap-2">
-                    <input type="text"
-                        id="comment-input-{{ $post->id }}"
-                        placeholder="Write a comment…"
-                        maxlength="500"
-                        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment({{ $post->id }});}"
-                        class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 transition">
-                    <button onclick="submitComment({{ $post->id }})"
-                        class="bg-primary text-white text-sm px-3 py-2 rounded-xl hover:bg-red-700 transition">
-                        <i class="fa fa-paper-plane"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-    </div>{{-- /post card --}}
-    @empty
-    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-12 text-center">
-        <div class="text-5xl mb-4">🎓</div>
-        <h3 class="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2">No posts yet!</h3>
-        <p class="text-sm text-gray-400 dark:text-gray-500">Be the first to share a memory with your batch.</p>
-    </div>
-    @endforelse
-    </div>{{-- end #post-feed --}}
-
-    {{-- Load More --}}
-    @if($posts->hasMorePages())
-    <div class="mt-5 text-center" id="loadMoreWrap">
-        <button id="loadMoreBtn" onclick="loadMorePosts()"
-            data-next="{{ $posts->nextPageUrl() }}"
-            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium px-6 py-2.5 rounded-full hover:border-primary hover:text-primary transition">
-            <i class="fa fa-chevron-down mr-1.5 text-xs"></i>Load More
-        </button>
-    </div>
-    @endif
-
+{{-- Page heading --}}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
+  <h1 class="m-title" style="font-size:22px">
+    <i class="fa fa-users-line" style="margin-right:8px;color:var(--red-700)"></i>
+    <span data-en="Batch Wall">ব্যাচ ওয়াল</span>
+  </h1>
+  <p class="when" data-en="Share memories with your batch">ব্যাচের সাথে স্মৃতি ভাগ করুন</p>
 </div>
 
-{{-- Reactor modal --}}
-<div id="reactorsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onclick="if(event.target===this)closeReactorsModal()">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-            <div class="flex gap-2">
-                <button onclick="switchReactorTab('like')" id="reactor-tab-like"
-                    class="text-sm font-semibold px-3 py-1 rounded-full transition bg-kgreen/10 text-kgreen">
-                    👍 Liked <span id="reactor-like-count" class="text-xs font-normal opacity-70"></span>
-                </button>
-                <button onclick="switchReactorTab('dislike')" id="reactor-tab-dislike"
-                    class="text-sm font-semibold px-3 py-1 rounded-full transition text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
-                    👎 Disliked <span id="reactor-dislike-count" class="text-xs font-normal opacity-70"></span>
-                </button>
-            </div>
-            <button onclick="closeReactorsModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fa fa-times text-xs"></i>
-            </button>
+{{-- New posts banner (shown by polling JS) --}}
+<div id="newPostsBanner" class="hidden" style="margin-bottom:16px;background:var(--tint);border:1px solid var(--tint-2);border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+  <span style="font-size:14px;color:var(--red-700);font-weight:600">
+    <i class="fa fa-arrow-up" style="margin-right:6px"></i>
+    <span id="newPostsCount">0</span> <span data-en="new post(s) — click to refresh">টি নতুন পোস্ট — রিফ্রেশ করুন</span>
+  </span>
+  <button onclick="loadNewPosts()" class="btn btn-primary btn-sm" data-en="Refresh">রিফ্রেশ</button>
+</div>
+
+{{-- ================================================================
+     COMPOSER CARD
+================================================================ --}}
+<div class="panel" style="margin-bottom:18px">
+  <form action="{{ route('wall.store') }}" method="POST" enctype="multipart/form-data" id="postForm">
+    @csrf
+    <div style="display:flex;gap:12px">
+      {{-- My avatar --}}
+      @if($myPhoto)
+        <img src="{{ $myPhoto }}" alt="{{ $me->name }}" class="avatar" style="flex-shrink:0">
+      @else
+        <div class="avatar" style="flex-shrink:0;background:var(--red-700);color:#fff;display:grid;place-items:center;font-weight:700;font-family:var(--f-display)">{{ $myInitial }}</div>
+      @endif
+
+      {{-- Composer body --}}
+      <div style="flex:1;min-width:0">
+        <div style="position:relative">
+          <textarea id="postContent" name="content" rows="3"
+            placeholder="মনে কী আছে, {{ $me->name }}? @ টাইপ করে কাউকে মেনশন করুন…"
+            data-en-ph="What's on your mind, {{ $me->name }}? Use @ to mention someone…"
+            maxlength="1000"
+            oninput="updatePostBtn(); handleMentionInput(this)"
+            style="width:100%;border-radius:14px;padding:10px 12px;font-size:15px;background:var(--bg)"></textarea>
+          <div id="mentionDropdown" class="hidden" style="position:absolute;z-index:30;left:0;right:0;top:100%;margin-top:4px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;max-height:200px;overflow-y:auto"></div>
         </div>
-        <div id="reactorsList" class="max-h-64 overflow-y-auto py-2">
-            <div class="px-4 py-8 text-center text-sm text-gray-400">Loading…</div>
+
+        {{-- Character counter --}}
+        <div style="display:flex;justify-content:flex-end;margin:4px 0 8px">
+          <span id="charCounter" class="when">0 / 1000</span>
         </div>
+
+        {{-- Photo preview --}}
+        <div id="photoPreviewWrap" class="hidden" style="margin-bottom:8px;position:relative;display:inline-block">
+          <img id="photoPreview" src="" alt="Preview" style="height:120px;border-radius:12px;object-fit:cover;border:1px solid var(--line)">
+          <button type="button" onclick="clearWallPhoto()"
+            style="position:absolute;top:-8px;right:-8px;width:22px;height:22px;background:var(--red-700);color:#fff;border-radius:50%;border:0;cursor:pointer;font-size:11px;display:grid;place-items:center">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
+
+        {{-- Tag chips --}}
+        <div id="tagChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+
+        {{-- Hidden tagged_ids --}}
+        <input type="hidden" name="tagged_ids" id="taggedIds" value="">
+
+        {{-- Tag people input --}}
+        <div style="position:relative;margin-bottom:12px" id="tagInputWrap">
+          <div style="display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 12px">
+            <i class="fa fa-tag" style="color:var(--muted);font-size:12px"></i>
+            <input type="text" id="tagInput" placeholder="ব্যাচমেট ট্যাগ করুন…"
+              data-en-ph="Tag a batchmate…"
+              autocomplete="off"
+              oninput="searchTags(this.value)"
+              onfocus="searchTags(this.value)"
+              style="flex:1;background:transparent;border:0;padding:0;font-size:14px;color:var(--ink)">
+          </div>
+          <div id="tagDropdown" class="hidden" style="position:absolute;z-index:20;left:0;right:0;margin-top:4px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden"></div>
+        </div>
+
+        {{-- Action bar --}}
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <button type="button" onclick="document.getElementById('wallPhotoInput').click()" class="act">
+            <i class="fa fa-image" style="color:var(--red-700)"></i>
+            <span data-en="Photo">ছবি</span>
+          </button>
+          <input type="file" id="wallPhotoInput" name="photo" accept="image/*" class="hidden" onchange="previewWallPhoto(this)">
+          <button type="submit" id="postSubmitBtn" class="btn btn-primary btn-sm" disabled>
+            <i class="fa fa-paper-plane"></i> <span data-en="Post">পোস্ট করুন</span>
+          </button>
+        </div>
+      </div>
     </div>
+  </form>
+</div>
+
+{{-- Filter bar --}}
+<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+  <span class="when" style="margin-right:4px" data-en="Show:">দেখুন:</span>
+  @foreach([
+    'all'   => ['bn' => 'সব সময়',    'en' => 'All Time'],
+    'month' => ['bn' => 'এই মাস',    'en' => 'This Month'],
+    'week'  => ['bn' => 'এই সপ্তাহ', 'en' => 'This Week'],
+  ] as $val => $labels)
+  <a href="{{ route('wall.index', ['filter' => $val]) }}"
+     data-en="{{ $labels['en'] }}"
+     style="font-size:13px;padding:6px 14px;border-radius:999px;font-weight:600;border:1px solid;text-decoration:none;transition:background .15s;{{ $filter === $val ? 'background:var(--red-700);color:#fff;border-color:var(--red-700)' : 'background:#fff;color:var(--muted);border-color:var(--line)' }}">
+    {{ $labels['bn'] }}
+  </a>
+  @endforeach
+</div>
+
+{{-- ================================================================
+     FEED
+================================================================ --}}
+<div id="post-feed" class="feed">
+@forelse($posts as $post)
+@php
+    $authorPhoto = $post->alumni->photo_url
+        ? (str_starts_with($post->alumni->photo_url, 'uploads/')
+            ? asset($post->alumni->photo_url)
+            : asset('storage/' . $post->alumni->photo_url))
+        : null;
+    $userReaction = $post->reactions->where('alumni_id', $me->id)->first()?->type;
+    $likes        = $post->reactions->where('type', 'like')->count();
+    $dislikes     = $post->reactions->where('type', 'dislike')->count();
+    $commentCount = $post->allComments()->count();
+    $tagNames     = $post->tags->pluck('name');
+@endphp
+
+<div id="post-{{ $post->id }}" class="post-card panel" style="padding:0;overflow:hidden">
+
+  {{-- Post header --}}
+  <div style="display:flex;gap:12px;align-items:flex-start;padding:16px 16px 8px">
+    {{-- Author avatar --}}
+    @if($authorPhoto)
+      <img src="{{ $authorPhoto }}" alt="{{ $post->alumni->name }}" class="avatar" style="flex-shrink:0">
+    @else
+      <div class="avatar" style="flex-shrink:0;background:var(--red-700);color:#fff;display:grid;place-items:center;font-weight:700;font-family:var(--f-display)">{{ strtoupper(substr($post->alumni->name, 0, 1)) }}</div>
+    @endif
+
+    {{-- Author info --}}
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div>
+          <span class="who">{{ $post->alumni->name }}</span>
+          @if($tagNames->isNotEmpty())
+            <span class="when"> — {{ $tagNames->implode(', ') }}</span>
+          @endif
+          <div class="when" style="margin-top:2px;display:flex;align-items:center;gap:6px">
+            {{ $post->created_at->diffForHumans() }}
+            @if($post->updated_at->gt($post->created_at))
+              <span id="post-edited-label-{{ $post->id }}" style="font-style:italic;font-size:12px">(সম্পাদিত)</span>
+            @else
+              <span id="post-edited-label-{{ $post->id }}" class="hidden" style="font-style:italic;font-size:12px">(সম্পাদিত)</span>
+            @endif
+          </div>
+        </div>
+
+        {{-- Edit / Delete (own post or admin) --}}
+        @if($post->alumni_id === $me->id || $me->isAdmin())
+        <div style="display:flex;gap:4px;align-items:center">
+          @if($post->alumni_id === $me->id && $post->content)
+          <button onclick="toggleEditPost({{ $post->id }})" class="icon-btn" title="Edit post" style="width:28px;height:28px">
+            <i class="fa fa-pen-to-square" style="font-size:12px"></i>
+          </button>
+          @endif
+          <button onclick="deletePost({{ $post->id }})" class="icon-btn" title="Delete post" style="width:28px;height:28px">
+            <i class="fa fa-trash" style="font-size:12px"></i>
+          </button>
+        </div>
+        @endif
+      </div>
+    </div>
+  </div>
+
+  {{-- Post content --}}
+  @if($post->content)
+  <div id="post-content-{{ $post->id }}" class="post-body" style="padding:2px 16px 10px">
+    @if(strlen($post->content) > 200)
+      <span class="post-text-short">{{ substr($post->content, 0, 200) }}<span style="color:var(--muted)">…</span>
+        <button onclick="expandPost(this)" style="background:none;border:0;color:var(--red-700);font-size:13px;font-weight:600;cursor:pointer;padding:0 4px" data-en="See more">আরো দেখুন</button>
+      </span>
+      <span class="post-text-full hidden" data-full="{{ $post->content }}">{{ $post->content }}
+        <button onclick="collapsePost(this)" style="background:none;border:0;color:var(--red-700);font-size:13px;font-weight:600;cursor:pointer;padding:0 4px" data-en="See less">কম দেখুন</button>
+      </span>
+    @else
+      {{ $post->content }}
+    @endif
+  </div>
+  @endif
+
+  {{-- Inline edit form (hidden) --}}
+  @if($post->alumni_id === $me->id && $post->content)
+  <div id="post-edit-form-{{ $post->id }}" class="hidden" style="padding:0 16px 12px">
+    <textarea id="post-edit-input-{{ $post->id }}" rows="3" maxlength="1000"
+      style="width:100%;border-radius:12px;padding:10px 12px;font-size:14px;border-color:var(--red-700)">{{ $post->content }}</textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
+      <button onclick="cancelEditPost({{ $post->id }})" class="btn btn-ghost btn-sm" data-en="Cancel">বাতিল</button>
+      <button onclick="saveEditPost({{ $post->id }})" class="btn btn-primary btn-sm" data-en="Save">সংরক্ষণ</button>
+    </div>
+  </div>
+  @endif
+
+  {{-- Post photo --}}
+  @if($post->photo_url)
+  <div style="margin-top:4px">
+    <img src="{{ asset($post->photo_url) }}" alt="Post photo" style="width:100%;max-height:420px;object-fit:cover">
+  </div>
+  @endif
+
+  {{-- Reaction counts summary --}}
+  <div style="padding:8px 16px 4px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)">
+    <button onclick="showReactors('post', {{ $post->id }}, 'like')"
+      id="post-likes-summary-{{ $post->id }}"
+      class="{{ $likes > 0 ? '' : 'hidden' }}"
+      style="background:none;border:0;cursor:pointer;color:var(--muted);font-size:13px;padding:0">{{ $likes > 0 ? $likes : 0 }} 👍</button>
+    <button onclick="showReactors('post', {{ $post->id }}, 'dislike')"
+      id="post-dislikes-summary-{{ $post->id }}"
+      class="{{ $dislikes > 0 ? '' : 'hidden' }}"
+      style="background:none;border:0;cursor:pointer;color:var(--muted);font-size:13px;padding:0">{{ $dislikes > 0 ? $dislikes : 0 }} 👎</button>
+    <span id="post-comment-count-{{ $post->id }}" class="{{ $commentCount > 0 ? '' : 'hidden' }}">{{ $commentCount > 0 ? $commentCount : 0 }} 💬</span>
+  </div>
+
+  {{-- Action bar --}}
+  <div class="actions" style="margin:0 12px;padding:4px 0">
+    {{-- Like --}}
+    <button data-post="{{ $post->id }}" data-type="like"
+      onclick="reactPost(this)"
+      id="btn-like-{{ $post->id }}"
+      class="act {{ $userReaction === 'like' ? 'text-kgreen' : 'text-kgray' }}">
+      <i class="fa fa-thumbs-up"></i>
+      <span id="post-like-count-{{ $post->id }}">{{ $likes > 0 ? $likes : '' }}</span>
+      <span data-en="Like">লাইক</span>
+    </button>
+
+    {{-- Dislike --}}
+    <button data-post="{{ $post->id }}" data-type="dislike"
+      onclick="reactPost(this)"
+      id="btn-dislike-{{ $post->id }}"
+      class="act {{ $userReaction === 'dislike' ? 'text-primary' : 'text-kgray' }}">
+      <i class="fa fa-thumbs-down"></i>
+      <span id="post-dislike-count-{{ $post->id }}">{{ $dislikes > 0 ? $dislikes : '' }}</span>
+      <span data-en="Dislike">ডিসলাইক</span>
+    </button>
+
+    {{-- Comment toggle --}}
+    <button onclick="toggleComments({{ $post->id }})"
+      id="btn-comment-{{ $post->id }}"
+      class="act text-kgray">
+      <i class="fa fa-comment"></i>
+      <span id="btn-comment-count-{{ $post->id }}" class="{{ $commentCount > 0 ? 'font-bold' : 'hidden' }}">{{ $commentCount > 0 ? $commentCount : '' }}</span>
+      <span data-en="Comment">মন্তব্য</span>
+    </button>
+  </div>
+
+  {{-- ============================================================
+       COMMENTS SECTION
+  ============================================================ --}}
+  <div id="comments-{{ $post->id }}" class="hidden" style="border-top:1px solid var(--line);background:var(--bg);border-radius:0 0 20px 20px;padding:16px">
+
+    {{-- Existing comments --}}
+    <div id="comment-list-{{ $post->id }}" class="comments">
+      @foreach($post->comments as $comment)
+      @php
+          $cPhoto = $comment->alumni->photo_url
+              ? (str_starts_with($comment->alumni->photo_url, 'uploads/')
+                  ? asset($comment->alumni->photo_url)
+                  : asset('storage/' . $comment->alumni->photo_url))
+              : null;
+          $cLikes    = $comment->reactions->where('type','like')->count();
+          $cDislikes = $comment->reactions->where('type','dislike')->count();
+          $cUserRxn  = $comment->reactions->where('alumni_id', $me->id)->first()?->type;
+      @endphp
+
+      <div id="comment-{{ $comment->id }}" class="cmt">
+        {{-- Avatar --}}
+        @if($cPhoto)
+          <img src="{{ $cPhoto }}" alt="{{ $comment->alumni->name }}" class="avatar sm">
+        @else
+          <div class="avatar sm" style="background:var(--red-700);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;font-family:var(--f-display)">{{ strtoupper(substr($comment->alumni->name, 0, 1)) }}</div>
+        @endif
+
+        <div style="flex:1;min-width:0">
+          {{-- Comment bubble --}}
+          <div class="bub">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px">
+              <span class="who" style="font-size:13px">{{ $comment->alumni->name }}</span>
+              <div style="display:flex;gap:2px">
+                @if($comment->alumni_id === $me->id)
+                <button onclick="toggleEditComment({{ $comment->id }})" class="icon-btn" style="width:22px;height:22px" title="Edit">
+                  <i class="fa fa-pen-to-square" style="font-size:11px"></i>
+                </button>
+                @endif
+                @if($comment->alumni_id === $me->id || $me->isAdmin())
+                <button onclick="deleteComment({{ $comment->id }})" class="icon-btn" style="width:22px;height:22px">
+                  <i class="fa fa-times" style="font-size:11px"></i>
+                </button>
+                @endif
+              </div>
+            </div>
+            <p id="comment-text-{{ $comment->id }}" style="font-size:14px;margin:0">{{ $comment->content }}</p>
+          </div>
+
+          {{-- Inline comment edit form --}}
+          @if($comment->alumni_id === $me->id)
+          <div id="comment-edit-form-{{ $comment->id }}" class="hidden" style="margin-top:6px">
+            <textarea id="comment-edit-input-{{ $comment->id }}" rows="2" maxlength="500"
+              style="width:100%;border-radius:10px;padding:8px 10px;font-size:13px;border-color:var(--red-700)">{{ $comment->content }}</textarea>
+            <div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end">
+              <button onclick="cancelEditComment({{ $comment->id }})" class="btn btn-ghost btn-sm" style="font-size:12px;padding:4px 10px" data-en="Cancel">বাতিল</button>
+              <button onclick="saveEditComment({{ $comment->id }})" class="btn btn-primary btn-sm" style="font-size:12px;padding:4px 10px" data-en="Save">সংরক্ষণ</button>
+            </div>
+          </div>
+          @endif
+
+          {{-- Comment meta --}}
+          <div style="display:flex;align-items:center;gap:10px;margin-top:5px;padding-left:2px">
+            <span class="when">{{ $comment->created_at->diffForHumans() }}</span>
+            <span id="comment-edited-{{ $comment->id }}" class="{{ $comment->updated_at->gt($comment->created_at) ? '' : 'hidden' }}" style="font-size:12px;color:var(--muted);font-style:italic">(সম্পাদিত)</span>
+            {{-- Like comment --}}
+            <button data-comment="{{ $comment->id }}" data-type="like"
+              onclick="reactComment(this)"
+              id="cbtn-like-{{ $comment->id }}"
+              class="{{ $cUserRxn === 'like' ? 'text-kgreen' : 'text-gray-400' }}"
+              style="background:none;border:0;cursor:pointer;font-size:12px;font-weight:600;padding:0">
+              <i class="fa fa-thumbs-up"></i>
+              <span id="c-like-count-{{ $comment->id }}">{{ $cLikes > 0 ? $cLikes : '' }}</span>
+            </button>
+            {{-- Dislike comment --}}
+            <button data-comment="{{ $comment->id }}" data-type="dislike"
+              onclick="reactComment(this)"
+              id="cbtn-dislike-{{ $comment->id }}"
+              class="{{ $cUserRxn === 'dislike' ? 'text-primary' : 'text-gray-400' }}"
+              style="background:none;border:0;cursor:pointer;font-size:12px;font-weight:600;padding:0">
+              <i class="fa fa-thumbs-down"></i>
+              <span id="c-dislike-count-{{ $comment->id }}">{{ $cDislikes > 0 ? $cDislikes : '' }}</span>
+            </button>
+            {{-- Reply --}}
+            <button onclick="toggleReply({{ $comment->id }}, {{ $post->id }})"
+              style="background:none;border:0;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);padding:0"
+              data-en="Reply">জবাব</button>
+          </div>
+
+          {{-- Reply form (hidden) --}}
+          <div id="reply-form-{{ $comment->id }}" class="hidden" style="margin-top:8px">
+            <div style="display:flex;gap:8px">
+              @if($myPhoto)
+                <img src="{{ $myPhoto }}" class="avatar sm" alt="" style="flex-shrink:0">
+              @else
+                <div class="avatar sm" style="flex-shrink:0;background:var(--red-700);color:#fff;display:grid;place-items:center;font-weight:700;font-size:11px;font-family:var(--f-display)">{{ $myInitial }}</div>
+              @endif
+              <div style="flex:1;display:flex;gap:8px">
+                <input type="text"
+                  id="reply-input-{{ $comment->id }}"
+                  placeholder="জবাব লিখুন…"
+                  maxlength="500"
+                  style="flex:1;min-width:0;border-radius:10px;padding:6px 10px;font-size:13px">
+                <button onclick="submitReply({{ $comment->id }}, {{ $post->id }})" class="btn btn-primary btn-sm" style="padding:6px 12px;flex-shrink:0">
+                  <i class="fa fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {{-- Replies --}}
+          @if($comment->replies->isNotEmpty())
+          <div id="replies-{{ $comment->id }}" style="margin-top:8px;margin-left:38px;display:grid;gap:8px">
+            @foreach($comment->replies as $reply)
+            @php
+                $rPhoto = $reply->alumni->photo_url
+                    ? (str_starts_with($reply->alumni->photo_url, 'uploads/')
+                        ? asset($reply->alumni->photo_url)
+                        : asset('storage/' . $reply->alumni->photo_url))
+                    : null;
+                $rLikes    = $reply->reactions->where('type','like')->count();
+                $rDislikes = $reply->reactions->where('type','dislike')->count();
+                $rUserRxn  = $reply->reactions->where('alumni_id', $me->id)->first()?->type;
+            @endphp
+            <div id="comment-{{ $reply->id }}" class="cmt">
+              @if($rPhoto)
+                <img src="{{ $rPhoto }}" alt="{{ $reply->alumni->name }}" class="avatar sm">
+              @else
+                <div class="avatar sm" style="background:var(--red-700);color:#fff;display:grid;place-items:center;font-weight:700;font-size:11px;font-family:var(--f-display)">{{ strtoupper(substr($reply->alumni->name, 0, 1)) }}</div>
+              @endif
+              <div style="flex:1;min-width:0">
+                <div class="bub">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px">
+                    <span class="who" style="font-size:12px">{{ $reply->alumni->name }}</span>
+                    <div style="display:flex;gap:2px">
+                      @if($reply->alumni_id === $me->id)
+                      <button onclick="toggleEditComment({{ $reply->id }})" class="icon-btn" style="width:20px;height:20px" title="Edit">
+                        <i class="fa fa-pen-to-square" style="font-size:10px"></i>
+                      </button>
+                      @endif
+                      @if($reply->alumni_id === $me->id || $me->isAdmin())
+                      <button onclick="deleteComment({{ $reply->id }})" class="icon-btn" style="width:20px;height:20px">
+                        <i class="fa fa-times" style="font-size:10px"></i>
+                      </button>
+                      @endif
+                    </div>
+                  </div>
+                  <p id="comment-text-{{ $reply->id }}" style="font-size:13px;margin:0">{{ $reply->content }}</p>
+                </div>
+                @if($reply->alumni_id === $me->id)
+                <div id="comment-edit-form-{{ $reply->id }}" class="hidden" style="margin-top:6px">
+                  <textarea id="comment-edit-input-{{ $reply->id }}" rows="2" maxlength="500"
+                    style="width:100%;border-radius:10px;padding:8px 10px;font-size:12px;border-color:var(--red-700)">{{ $reply->content }}</textarea>
+                  <div style="display:flex;gap:6px;margin-top:4px;justify-content:flex-end">
+                    <button onclick="cancelEditComment({{ $reply->id }})" class="btn btn-ghost btn-sm" style="font-size:11px;padding:3px 8px" data-en="Cancel">বাতিল</button>
+                    <button onclick="saveEditComment({{ $reply->id }})" class="btn btn-primary btn-sm" style="font-size:11px;padding:3px 8px" data-en="Save">সংরক্ষণ</button>
+                  </div>
+                </div>
+                @endif
+                <div style="display:flex;align-items:center;gap:10px;margin-top:5px;padding-left:2px">
+                  <span class="when">{{ $reply->created_at->diffForHumans() }}</span>
+                  <span id="comment-edited-{{ $reply->id }}" class="{{ $reply->updated_at->gt($reply->created_at) ? '' : 'hidden' }}" style="font-size:12px;color:var(--muted);font-style:italic">(সম্পাদিত)</span>
+                  <button data-comment="{{ $reply->id }}" data-type="like"
+                    onclick="reactComment(this)"
+                    id="cbtn-like-{{ $reply->id }}"
+                    class="{{ $rUserRxn === 'like' ? 'text-kgreen' : 'text-gray-400' }}"
+                    style="background:none;border:0;cursor:pointer;font-size:12px;font-weight:600;padding:0">
+                    <i class="fa fa-thumbs-up"></i>
+                    <span id="c-like-count-{{ $reply->id }}">{{ $rLikes > 0 ? $rLikes : '' }}</span>
+                  </button>
+                  <button data-comment="{{ $reply->id }}" data-type="dislike"
+                    onclick="reactComment(this)"
+                    id="cbtn-dislike-{{ $reply->id }}"
+                    class="{{ $rUserRxn === 'dislike' ? 'text-primary' : 'text-gray-400' }}"
+                    style="background:none;border:0;cursor:pointer;font-size:12px;font-weight:600;padding:0">
+                    <i class="fa fa-thumbs-down"></i>
+                    <span id="c-dislike-count-{{ $reply->id }}">{{ $rDislikes > 0 ? $rDislikes : '' }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            @endforeach
+          </div>
+          @else
+          <div id="replies-{{ $comment->id }}" style="margin-top:8px;margin-left:38px;display:grid;gap:8px"></div>
+          @endif
+
+        </div>
+      </div>
+      @endforeach
+    </div>
+
+    {{-- Add comment form --}}
+    <div id="comment-form-{{ $post->id }}" class="cform" style="margin-top:12px">
+      @if($myPhoto)
+        <img src="{{ $myPhoto }}" class="avatar sm" alt="" style="flex-shrink:0">
+      @else
+        <div class="avatar sm" style="flex-shrink:0;background:var(--red-700);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;font-family:var(--f-display)">{{ $myInitial }}</div>
+      @endif
+      <input type="text"
+        id="comment-input-{{ $post->id }}"
+        placeholder="মন্তব্য লিখুন…"
+        data-en-ph="Add a comment…"
+        maxlength="500"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment({{ $post->id }});}"
+        style="flex:1;border-radius:12px;padding:8px 12px;font-size:14px">
+      <button onclick="submitComment({{ $post->id }})" class="btn btn-primary btn-sm" style="padding:8px 14px;flex-shrink:0">
+        <i class="fa fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+</div>{{-- /post card --}}
+@empty
+<div class="panel" style="text-align:center;padding:48px 24px">
+  <div style="font-size:48px;margin-bottom:16px">🎓</div>
+  <h3 style="font-size:18px;font-weight:600;color:var(--muted);margin-bottom:8px" data-en="No posts yet!">এখনো কোনো পোস্ট নেই!</h3>
+  <p style="font-size:14px;color:var(--muted)" data-en="Be the first to share a memory with your batch.">প্রথম হয়ে ব্যাচের সাথে একটি স্মৃতি শেয়ার করুন।</p>
+</div>
+@endforelse
+</div>{{-- end #post-feed --}}
+
+{{-- Load More --}}
+@if($posts->hasMorePages())
+<div id="loadMoreWrap" style="margin-top:20px;text-align:center">
+  <button id="loadMoreBtn" onclick="loadMorePosts()"
+    data-next="{{ $posts->nextPageUrl() }}"
+    class="btn btn-ghost">
+    <i class="fa fa-chevron-down" style="font-size:12px;margin-right:4px"></i>
+    <span data-en="Load More">আরো দেখুন</span>
+  </button>
+</div>
+@endif
+
+</div>{{-- /col --}}
+</div>{{-- /wrap --}}
+</div>{{-- /m-main --}}
+
+{{-- Reactor modal --}}
+<div id="reactorsModal" class="hidden" style="position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.4)" onclick="if(event.target===this)closeReactorsModal()">
+  <div class="panel" style="width:100%;max-width:320px;padding:0;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)">
+      <div style="display:flex;gap:8px">
+        <button onclick="switchReactorTab('like')" id="reactor-tab-like"
+          style="font-size:13px;font-weight:600;padding:5px 12px;border-radius:999px;border:0;cursor:pointer;background:rgba(22,163,74,.1);color:#16a34a">
+          👍 <span data-en="Liked">লাইক করেছেন</span> <span id="reactor-like-count" style="font-size:11px;opacity:.7"></span>
+        </button>
+        <button onclick="switchReactorTab('dislike')" id="reactor-tab-dislike"
+          style="font-size:13px;font-weight:600;padding:5px 12px;border-radius:999px;border:0;cursor:pointer;background:transparent;color:var(--muted)">
+          👎 <span data-en="Disliked">ডিসলাইক করেছেন</span> <span id="reactor-dislike-count" style="font-size:11px;opacity:.7"></span>
+        </button>
+      </div>
+      <button onclick="closeReactorsModal()" class="icon-btn" style="width:28px;height:28px">
+        <i class="fa fa-times" style="font-size:12px"></i>
+      </button>
+    </div>
+    <div id="reactorsList" style="max-height:260px;overflow-y:auto;padding:8px 0">
+      <div style="padding:32px 16px;text-align:center;font-size:14px;color:var(--muted)" data-en="Loading…">লোড হচ্ছে…</div>
+    </div>
+  </div>
 </div>
 
 {{-- ====================================================================
@@ -671,8 +620,8 @@ function updatePostBtn() {
 
     const len = document.getElementById('postContent').value.length;
     counter.textContent = len + ' / 1000';
-    if (len > 900) counter.classList.add('text-primary');
-    else counter.classList.remove('text-primary');
+    if (len > 900) counter.style.color = 'var(--red-700)';
+    else counter.style.color = '';
 
     btn.disabled = !(content || hasPhoto);
 }
@@ -726,7 +675,6 @@ async function reactPost(btn) {
         });
         const data = await res.json();
 
-        // Update like button
         const likeBtn    = document.getElementById(`btn-like-${postId}`);
         const dislikeBtn = document.getElementById(`btn-dislike-${postId}`);
         const likeCount    = document.getElementById(`post-like-count-${postId}`);
@@ -737,22 +685,21 @@ async function reactPost(btn) {
 
         if (data.user_reaction === 'like') {
             likeBtn.classList.add('text-kgreen');
-            likeBtn.classList.remove('text-kgray', 'dark:text-gray-400');
+            likeBtn.classList.remove('text-kgray');
             dislikeBtn.classList.remove('text-primary');
-            dislikeBtn.classList.add('text-kgray', 'dark:text-gray-400');
+            dislikeBtn.classList.add('text-kgray');
         } else if (data.user_reaction === 'dislike') {
             dislikeBtn.classList.add('text-primary');
-            dislikeBtn.classList.remove('text-kgray', 'dark:text-gray-400');
+            dislikeBtn.classList.remove('text-kgray');
             likeBtn.classList.remove('text-kgreen');
-            likeBtn.classList.add('text-kgray', 'dark:text-gray-400');
+            likeBtn.classList.add('text-kgray');
         } else {
             likeBtn.classList.remove('text-kgreen');
-            likeBtn.classList.add('text-kgray', 'dark:text-gray-400');
+            likeBtn.classList.add('text-kgray');
             dislikeBtn.classList.remove('text-primary');
-            dislikeBtn.classList.add('text-kgray', 'dark:text-gray-400');
+            dislikeBtn.classList.add('text-kgray');
         }
 
-        // Update summary counts
         updateSummary(postId, data.likes, data.dislikes);
     } catch(e) {
         console.error('Reaction error:', e);
@@ -827,12 +774,12 @@ function toggleComments(postId) {
     if (!section.classList.contains('hidden')) {
         openPostIds.add(postId);
         btn.classList.add('text-primary');
-        btn.classList.remove('text-kgray', 'dark:text-gray-400');
+        btn.classList.remove('text-kgray');
         document.getElementById(`comment-input-${postId}`).focus();
     } else {
         openPostIds.delete(postId);
         btn.classList.remove('text-primary');
-        btn.classList.add('text-kgray', 'dark:text-gray-400');
+        btn.classList.add('text-kgray');
     }
 }
 
@@ -840,7 +787,7 @@ function toggleComments(postId) {
    DELETE POST
 ────────────────────────────────────────────── */
 async function deletePost(postId) {
-    if (!confirm('Delete this post? This cannot be undone.')) return;
+    if (!confirm('এই পোস্টটি মুছে ফেলবেন? এটি আর পুনরুদ্ধার করা যাবে না।')) return;
     try {
         const res = await fetch(`/posts/${postId}`, {
             method: 'DELETE',
@@ -864,7 +811,7 @@ async function deletePost(postId) {
    DELETE COMMENT
 ────────────────────────────────────────────── */
 async function deleteComment(commentId) {
-    if (!confirm('Delete this comment?')) return;
+    if (!confirm('এই মন্তব্যটি মুছে ফেলবেন?')) return;
     try {
         const res = await fetch(`/comments/${commentId}`, {
             method: 'DELETE',
@@ -914,70 +861,71 @@ async function submitComment(postId) {
 
 function buildCommentHTML(c, postId) {
     const avatarHtml = c.photo
-        ? `<img src="${c.photo}" alt="${c.author}" class="w-8 h-8 rounded-full object-cover ring-1 ring-[#c0392b]/20">`
-        : `<div class="w-8 h-8 rounded-full bg-[#c0392b] text-white flex items-center justify-center font-bold text-xs">${c.initial}</div>`;
+        ? `<img src="${c.photo}" alt="${c.author}" class="avatar sm" style="flex-shrink:0">`
+        : `<div class="avatar sm" style="flex-shrink:0;background:var(--red-700);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;font-family:var(--f-display)">${c.initial}</div>`;
 
     const editBtn = c.can_delete
-        ? `<button onclick="toggleEditComment(${c.id})" class="text-gray-300 dark:text-gray-600 hover:text-blue-500 text-xs transition" title="Edit"><i class="fa fa-pen-to-square"></i></button>`
+        ? `<button onclick="toggleEditComment(${c.id})" class="icon-btn" style="width:22px;height:22px" title="Edit"><i class="fa fa-pen-to-square" style="font-size:11px"></i></button>`
         : '';
     const deleteBtn = c.can_delete
-        ? `<button onclick="deleteComment(${c.id})" class="text-gray-300 dark:text-gray-600 hover:text-[#c0392b] text-xs transition"><i class="fa fa-times"></i></button>`
+        ? `<button onclick="deleteComment(${c.id})" class="icon-btn" style="width:22px;height:22px"><i class="fa fa-times" style="font-size:11px"></i></button>`
         : '';
     const editForm = c.can_delete
-        ? `<div id="comment-edit-form-${c.id}" class="hidden mt-1">
+        ? `<div id="comment-edit-form-${c.id}" class="hidden" style="margin-top:6px">
             <textarea id="comment-edit-input-${c.id}" rows="2" maxlength="500"
-                class="w-full bg-white dark:bg-gray-800 border border-[#c0392b]/40 rounded-xl px-3 py-2 text-sm text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#c0392b]/40 resize-none transition">${c.content}</textarea>
-            <div class="flex items-center gap-2 mt-1 justify-end">
-                <button onclick="cancelEditComment(${c.id})" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-600 transition">Cancel</button>
-                <button onclick="saveEditComment(${c.id})" class="text-xs bg-[#c0392b] text-white px-2 py-1 rounded-lg hover:bg-red-700 transition font-semibold">Save</button>
+                style="width:100%;border-radius:10px;padding:8px 10px;font-size:13px;border-color:var(--red-700)">${c.content}</textarea>
+            <div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end">
+                <button onclick="cancelEditComment(${c.id})" class="btn btn-ghost btn-sm" style="font-size:12px;padding:4px 10px">Cancel</button>
+                <button onclick="saveEditComment(${c.id})" class="btn btn-primary btn-sm" style="font-size:12px;padding:4px 10px">Save</button>
             </div>
         </div>`
         : '';
 
     return `
-    <div id="comment-${c.id}" class="flex gap-2.5">
-        <div class="flex-shrink-0">${avatarHtml}</div>
-        <div class="flex-1 min-w-0">
-            <div class="bg-white dark:bg-gray-800 rounded-xl px-3 py-2 text-sm shadow-sm border border-gray-100 dark:border-gray-700">
-                <div class="flex items-start justify-between gap-2">
-                    <span class="font-semibold text-gray-800 dark:text-gray-100 text-xs">${c.author}</span>
-                    <div class="flex items-center gap-1">${editBtn}${deleteBtn}</div>
+    <div id="comment-${c.id}" class="cmt">
+        <div style="flex-shrink:0">${avatarHtml}</div>
+        <div style="flex:1;min-width:0">
+            <div class="bub">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px">
+                    <span class="who" style="font-size:13px">${c.author}</span>
+                    <div style="display:flex;gap:2px">${editBtn}${deleteBtn}</div>
                 </div>
-                <p id="comment-text-${c.id}" class="text-gray-700 dark:text-gray-200 mt-0.5 break-words">${c.content}</p>
+                <p id="comment-text-${c.id}" style="font-size:14px;margin:0">${c.content}</p>
             </div>
             ${editForm}
-            <div class="flex items-center gap-3 mt-1 px-1">
-                <span class="text-xs text-gray-400">${c.time}</span>
-                <span id="comment-edited-${c.id}" class="hidden text-xs text-gray-300 italic">(Edited)</span>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:5px;padding-left:2px">
+                <span class="when">${c.time}</span>
+                <span id="comment-edited-${c.id}" class="hidden" style="font-size:12px;color:var(--muted);font-style:italic">(Edited)</span>
                 <button data-comment="${c.id}" data-type="like" onclick="reactComment(this)"
                     id="cbtn-like-${c.id}"
-                    class="text-xs font-medium text-gray-400 hover:text-[#27ae60] transition">
+                    class="text-gray-400"
+                    style="background:none;border:0;cursor:pointer;font-size:12px;font-weight:600;padding:0">
                     <i class="fa fa-thumbs-up"></i>
                     <span id="c-like-count-${c.id}"></span>
                 </button>
                 <button data-comment="${c.id}" data-type="dislike" onclick="reactComment(this)"
                     id="cbtn-dislike-${c.id}"
-                    class="text-xs font-medium text-gray-400 hover:text-[#c0392b] transition">
+                    class="text-gray-400"
+                    style="background:none;border:0;cursor:pointer;font-size:12px;font-weight:600;padding:0">
                     <i class="fa fa-thumbs-down"></i>
                     <span id="c-dislike-count-${c.id}"></span>
                 </button>
                 <button onclick="toggleReply(${c.id}, ${postId})"
-                    class="text-xs text-gray-400 hover:text-[#c0392b] transition font-medium">Reply</button>
+                    style="background:none;border:0;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);padding:0">Reply</button>
             </div>
-            <div id="reply-form-${c.id}" class="hidden mt-2">
-                <div class="flex gap-2">
-                    <div class="flex-shrink-0">${avatarHtml.replace('w-8 h-8', 'w-7 h-7').replace('text-xs', 'text-xs')}</div>
-                    <div class="flex-1 flex gap-2">
+            <div id="reply-form-${c.id}" class="hidden" style="margin-top:8px">
+                <div style="display:flex;gap:8px">
+                    <div style="flex-shrink:0">${avatarHtml}</div>
+                    <div style="flex:1;display:flex;gap:8px">
                         <input type="text" id="reply-input-${c.id}" placeholder="Write a reply…" maxlength="500"
-                            class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-1.5 text-xs text-gray-700 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#c0392b]/40 transition">
-                        <button onclick="submitReply(${c.id}, ${postId})"
-                            class="bg-[#c0392b] text-white text-xs px-3 py-1.5 rounded-xl hover:bg-red-700 transition">
+                            style="flex:1;min-width:0;border-radius:10px;padding:6px 10px;font-size:13px">
+                        <button onclick="submitReply(${c.id}, ${postId})" class="btn btn-primary btn-sm" style="padding:6px 12px;flex-shrink:0">
                             <i class="fa fa-paper-plane"></i>
                         </button>
                     </div>
                 </div>
             </div>
-            <div id="replies-${c.id}" class="mt-2 ml-10 space-y-2"></div>
+            <div id="replies-${c.id}" style="margin-top:8px;margin-left:38px;display:grid;gap:8px"></div>
         </div>
     </div>`;
 }
@@ -1044,50 +992,52 @@ async function submitReply(commentId, postId) {
 
 function buildReplyHTML(c) {
     const avatarHtml = c.photo
-        ? `<img src="${c.photo}" alt="${c.author}" class="w-7 h-7 rounded-full object-cover ring-1 ring-[#c0392b]/20">`
-        : `<div class="w-7 h-7 rounded-full bg-[#c0392b] text-white flex items-center justify-center font-bold text-xs">${c.initial}</div>`;
+        ? `<img src="${c.photo}" alt="${c.author}" class="avatar sm" style="flex-shrink:0">`
+        : `<div class="avatar sm" style="flex-shrink:0;background:var(--red-700);color:#fff;display:grid;place-items:center;font-weight:700;font-size:11px;font-family:var(--f-display)">${c.initial}</div>`;
 
     const editBtn = c.can_delete
-        ? `<button onclick="toggleEditComment(${c.id})" class="text-gray-300 dark:text-gray-600 hover:text-blue-500 text-xs transition" title="Edit"><i class="fa fa-pen-to-square"></i></button>`
+        ? `<button onclick="toggleEditComment(${c.id})" class="icon-btn" style="width:20px;height:20px" title="Edit"><i class="fa fa-pen-to-square" style="font-size:10px"></i></button>`
         : '';
     const deleteBtn = c.can_delete
-        ? `<button onclick="deleteComment(${c.id})" class="text-gray-300 dark:text-gray-600 hover:text-[#c0392b] text-xs transition"><i class="fa fa-times"></i></button>`
+        ? `<button onclick="deleteComment(${c.id})" class="icon-btn" style="width:20px;height:20px"><i class="fa fa-times" style="font-size:10px"></i></button>`
         : '';
     const editForm = c.can_delete
-        ? `<div id="comment-edit-form-${c.id}" class="hidden mt-1">
+        ? `<div id="comment-edit-form-${c.id}" class="hidden" style="margin-top:6px">
             <textarea id="comment-edit-input-${c.id}" rows="2" maxlength="500"
-                class="w-full bg-white dark:bg-gray-800 border border-[#c0392b]/40 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#c0392b]/40 resize-none transition">${c.content}</textarea>
-            <div class="flex items-center gap-2 mt-1 justify-end">
-                <button onclick="cancelEditComment(${c.id})" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-600 transition">Cancel</button>
-                <button onclick="saveEditComment(${c.id})" class="text-xs bg-[#c0392b] text-white px-2 py-1 rounded-lg hover:bg-red-700 transition font-semibold">Save</button>
+                style="width:100%;border-radius:10px;padding:8px 10px;font-size:12px;border-color:var(--red-700)">${c.content}</textarea>
+            <div style="display:flex;gap:6px;margin-top:4px;justify-content:flex-end">
+                <button onclick="cancelEditComment(${c.id})" class="btn btn-ghost btn-sm" style="font-size:11px;padding:3px 8px">Cancel</button>
+                <button onclick="saveEditComment(${c.id})" class="btn btn-primary btn-sm" style="font-size:11px;padding:3px 8px">Save</button>
             </div>
         </div>`
         : '';
 
     return `
-    <div id="comment-${c.id}" class="flex gap-2">
-        <div class="flex-shrink-0">${avatarHtml}</div>
-        <div class="flex-1 min-w-0">
-            <div class="bg-white dark:bg-gray-800 rounded-xl px-3 py-2 text-sm shadow-sm border border-gray-100 dark:border-gray-700">
-                <div class="flex items-start justify-between gap-2">
-                    <span class="font-semibold text-gray-800 dark:text-gray-100 text-xs">${c.author}</span>
-                    <div class="flex items-center gap-1">${editBtn}${deleteBtn}</div>
+    <div id="comment-${c.id}" class="cmt">
+        <div style="flex-shrink:0">${avatarHtml}</div>
+        <div style="flex:1;min-width:0">
+            <div class="bub">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px">
+                    <span class="who" style="font-size:12px">${c.author}</span>
+                    <div style="display:flex;gap:2px">${editBtn}${deleteBtn}</div>
                 </div>
-                <p id="comment-text-${c.id}" class="text-gray-700 dark:text-gray-200 mt-0.5 break-words text-xs">${c.content}</p>
+                <p id="comment-text-${c.id}" style="font-size:13px;margin:0">${c.content}</p>
             </div>
             ${editForm}
-            <div class="flex items-center gap-3 mt-1 px-1">
-                <span class="text-xs text-gray-400">${c.time}</span>
-                <span id="comment-edited-${c.id}" class="hidden text-xs text-gray-300 italic">(Edited)</span>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:5px;padding-left:2px">
+                <span class="when">${c.time}</span>
+                <span id="comment-edited-${c.id}" class="hidden" style="font-size:12px;color:var(--muted);font-style:italic">(Edited)</span>
                 <button data-comment="${c.id}" data-type="like" onclick="reactComment(this)"
                     id="cbtn-like-${c.id}"
-                    class="text-xs font-medium text-gray-400 hover:text-[#27ae60] transition">
+                    class="text-gray-400"
+                    style="background:none;border:0;cursor:pointer;font-size:12px;font-weight:600;padding:0">
                     <i class="fa fa-thumbs-up"></i>
                     <span id="c-like-count-${c.id}"></span>
                 </button>
                 <button data-comment="${c.id}" data-type="dislike" onclick="reactComment(this)"
                     id="cbtn-dislike-${c.id}"
-                    class="text-xs font-medium text-gray-400 hover:text-[#c0392b] transition">
+                    class="text-gray-400"
+                    style="background:none;border:0;cursor:pointer;font-size:12px;font-weight:600;padding:0">
                     <i class="fa fa-thumbs-down"></i>
                     <span id="c-dislike-count-${c.id}"></span>
                 </button>
@@ -1126,25 +1076,26 @@ function showTagDropdown(people, showTagAll = false) {
 
     const tagAllBtn = (showTagAll && untagged.length > 0)
         ? `<button type="button" onclick="tagAllVisible()"
-                class="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left font-semibold text-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition border-b border-gray-100 dark:border-gray-700">
-                <i class="fa fa-users text-xs"></i> Tag All Classmates
+                style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;font-size:14px;font-weight:600;color:var(--red-700);background:none;border:0;border-bottom:1px solid var(--line);cursor:pointer;text-align:left">
+                <i class="fa fa-users" style="font-size:12px"></i> সব ব্যাচমেট ট্যাগ করুন
            </button>`
         : '';
 
     if (!untagged.length && !tagAllBtn) {
-        dd.innerHTML = '<div class="px-4 py-2.5 text-sm text-gray-400">No results found</div>';
+        dd.innerHTML = '<div style="padding:10px 12px;font-size:14px;color:var(--muted)">কেউ পাওয়া যায়নি</div>';
         dd.classList.remove('hidden');
         return;
     }
 
     dd.innerHTML = tagAllBtn + untagged.map(p => {
         const avatar = p.photo
-            ? `<img src="${p.photo}" class="w-7 h-7 rounded-full object-cover flex-shrink-0">`
-            : `<div class="w-7 h-7 rounded-full bg-[#c0392b] text-white flex items-center justify-center font-bold text-xs flex-shrink-0">${p.name.charAt(0).toUpperCase()}</div>`;
+            ? `<img src="${p.photo}" class="avatar sm" style="flex-shrink:0" alt="">`
+            : `<div class="avatar sm" style="flex-shrink:0;background:var(--red-700);color:#fff;display:grid;place-items:center;font-weight:700;font-size:11px;font-family:var(--f-display)">${p.name.charAt(0).toUpperCase()}</div>`;
         return `<button type="button" onclick='addTag(${JSON.stringify(p.id)}, ${JSON.stringify(p.name)})'
-            class="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+            style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 12px;font-size:14px;color:var(--ink);background:none;border:0;cursor:pointer;text-align:left;transition:background .1s"
+            onmouseover="this.style.background='var(--tint)'" onmouseout="this.style.background='none'">
             ${avatar}
-            <span class="text-gray-700 dark:text-gray-200">${p.name}</span>
+            <span>${p.name}</span>
         </button>`;
     }).join('');
     dd.classList.remove('hidden');
@@ -1166,8 +1117,8 @@ function addTag(id, name) {
 
     const chip = document.createElement('span');
     chip.id = `tag-chip-${id}`;
-    chip.className = 'inline-flex items-center gap-1 bg-primary/10 dark:bg-primary/20 text-primary text-xs font-medium px-2 py-1 rounded-full';
-    chip.innerHTML = `<i class="fa fa-at text-xs"></i>${name}<button type="button" onclick="removeTag(${id})" class="ml-0.5 hover:text-red-700 transition"><i class="fa fa-times text-xs"></i></button>`;
+    chip.style.cssText = 'display:inline-flex;align-items:center;gap:4px;background:var(--tint);color:var(--red-700);font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid var(--tint-2)';
+    chip.innerHTML = `<i class="fa fa-at" style="font-size:10px"></i>${name}<button type="button" onclick="removeTag(${id})" style="background:none;border:0;cursor:pointer;color:var(--red-700);margin-left:2px;line-height:1"><i class="fa fa-times" style="font-size:10px"></i></button>`;
     document.getElementById('tagChips').appendChild(chip);
 
     document.getElementById('tagInput').value = '';
@@ -1224,11 +1175,12 @@ function handleMentionInput(ta) {
             if (!dd) return;
             dd.innerHTML = people.map(p => {
                 const av = p.photo
-                    ? `<img src="${p.photo}" class="w-7 h-7 rounded-full object-cover flex-shrink-0">`
-                    : `<div class="w-7 h-7 rounded-full bg-[#c0392b] text-white flex items-center justify-center font-bold text-xs flex-shrink-0">${p.name.charAt(0).toUpperCase()}</div>`;
+                    ? `<img src="${p.photo}" class="avatar sm" style="flex-shrink:0" alt="">`
+                    : `<div class="avatar sm" style="flex-shrink:0;background:var(--red-700);color:#fff;display:grid;place-items:center;font-weight:700;font-size:11px;font-family:var(--f-display)">${p.name.charAt(0).toUpperCase()}</div>`;
                 return `<button type="button" onclick='pickMention(${JSON.stringify(p.id)}, ${JSON.stringify(p.name)})'
-                    class="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                    ${av}<span class="text-gray-700 dark:text-gray-200">${p.name}</span>
+                    style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 12px;font-size:14px;color:var(--ink);background:none;border:0;cursor:pointer;text-align:left;transition:background .1s"
+                    onmouseover="this.style.background='var(--tint)'" onmouseout="this.style.background='none'">
+                    ${av}<span>${p.name}</span>
                 </button>`;
             }).join('');
             dd.classList.remove('hidden');
@@ -1314,7 +1266,7 @@ async function saveEditPost(postId) {
     setTimeout(function() {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         el.style.transition = 'box-shadow 0.5s';
-        el.style.boxShadow  = '0 0 0 3px #c0392b66';
+        el.style.boxShadow  = '0 0 0 3px rgba(196,18,26,.4)';
         setTimeout(function() { el.style.boxShadow = ''; }, 2500);
     }, 400);
 })();
@@ -1331,7 +1283,7 @@ async function loadMorePosts() {
     if (!nextUrl) return;
 
     _loadingMore = true;
-    btn.innerHTML = '<i class="fa fa-spinner fa-spin mr-1.5 text-xs"></i>Loading…';
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin" style="margin-right:6px"></i>লোড হচ্ছে…';
     btn.disabled = true;
 
     try {
@@ -1354,13 +1306,13 @@ async function loadMorePosts() {
         const wrap    = document.getElementById('loadMoreWrap');
         if (nextBtn && nextBtn.dataset.next) {
             btn.dataset.next = nextBtn.dataset.next;
-            btn.innerHTML    = '<i class="fa fa-chevron-down mr-1.5 text-xs"></i>Load More';
+            btn.innerHTML    = '<i class="fa fa-chevron-down" style="font-size:12px;margin-right:4px"></i>আরো দেখুন';
             btn.disabled     = false;
         } else {
             if (wrap) wrap.remove();
         }
     } catch(e) {
-        btn.innerHTML = '<i class="fa fa-chevron-down mr-1.5 text-xs"></i>Load More';
+        btn.innerHTML = '<i class="fa fa-chevron-down" style="font-size:12px;margin-right:4px"></i>আরো দেখুন';
         btn.disabled  = false;
     }
     _loadingMore = false;
@@ -1385,8 +1337,9 @@ async function showReactors(modelType, modelId, tab) {
     _reactorTab = tab;
     const modal = document.getElementById('reactorsModal');
     if (!modal) return;
+    modal.style.display = 'flex';
     modal.classList.remove('hidden');
-    document.getElementById('reactorsList').innerHTML = '<div class="px-4 py-8 text-center text-sm text-gray-400">Loading…</div>';
+    document.getElementById('reactorsList').innerHTML = '<div style="padding:32px 16px;text-align:center;font-size:14px;color:var(--muted)">লোড হচ্ছে…</div>';
 
     const url = modelType === 'post' ? `/posts/${modelId}/reactions` : `/comments/${modelId}/reactions`;
     try {
@@ -1394,7 +1347,7 @@ async function showReactors(modelType, modelId, tab) {
         _reactorData = await res.json();
         _renderReactorList(tab);
     } catch(e) {
-        document.getElementById('reactorsList').innerHTML = '<div class="px-4 py-4 text-center text-sm text-red-400">Failed to load</div>';
+        document.getElementById('reactorsList').innerHTML = '<div style="padding:16px;text-align:center;font-size:14px;color:var(--red-700)">লোড ব্যর্থ হয়েছে</div>';
     }
 }
 
@@ -1409,11 +1362,15 @@ function _renderReactorList(tab) {
     const dislikeTab = document.getElementById('reactor-tab-dislike');
 
     if (tab === 'like') {
-        likeTab.className    = 'text-sm font-semibold px-3 py-1 rounded-full transition bg-[#27ae60]/10 text-[#27ae60]';
-        dislikeTab.className = 'text-sm font-semibold px-3 py-1 rounded-full transition text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700';
+        likeTab.style.background    = 'rgba(22,163,74,.12)';
+        likeTab.style.color         = '#16a34a';
+        dislikeTab.style.background = 'transparent';
+        dislikeTab.style.color      = 'var(--muted)';
     } else {
-        dislikeTab.className = 'text-sm font-semibold px-3 py-1 rounded-full transition bg-[#c0392b]/10 text-[#c0392b]';
-        likeTab.className    = 'text-sm font-semibold px-3 py-1 rounded-full transition text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700';
+        dislikeTab.style.background = 'rgba(196,18,26,.12)';
+        dislikeTab.style.color      = 'var(--red-700)';
+        likeTab.style.background    = 'transparent';
+        likeTab.style.color         = 'var(--muted)';
     }
 
     const likeCountEl    = document.getElementById('reactor-like-count');
@@ -1423,15 +1380,15 @@ function _renderReactorList(tab) {
 
     const el = document.getElementById('reactorsList');
     if (!list.length) {
-        el.innerHTML = `<div class="px-4 py-8 text-center text-sm text-gray-400">No ${tab === 'like' ? 'likes' : 'dislikes'} yet</div>`;
+        el.innerHTML = `<div style="padding:32px 16px;text-align:center;font-size:14px;color:var(--muted)">কোনো ${tab === 'like' ? 'লাইক' : 'ডিসলাইক'} নেই</div>`;
         return;
     }
 
     el.innerHTML = list.map(r => {
         const av = r.photo
-            ? `<img src="${r.photo}" class="w-9 h-9 rounded-full object-cover flex-shrink-0">`
-            : `<div class="w-9 h-9 rounded-full bg-[#c0392b] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">${r.initial}</div>`;
-        return `<div class="flex items-center gap-3 px-4 py-2.5">${av}<span class="text-sm text-gray-700 dark:text-gray-200">${r.name}</span></div>`;
+            ? `<img src="${r.photo}" class="avatar sm" style="flex-shrink:0" alt="">`
+            : `<div class="avatar sm" style="flex-shrink:0;background:var(--red-700);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;font-family:var(--f-display)">${r.initial}</div>`;
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 16px">${av}<span style="font-size:14px;color:var(--ink)">${r.name}</span></div>`;
     }).join('');
 }
 

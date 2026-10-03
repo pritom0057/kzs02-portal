@@ -1,107 +1,117 @@
-<!DOCTYPE html>
-<html lang="en" class="h-full">
+<!doctype html>
+<html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'KZS 2002 Reunion')</title>
-    <script>
-    (function(){
-        var t = localStorage.getItem('theme');
-        if(t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches)){
-            document.documentElement.classList.add('dark');
-        }
-    })();
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#c0392b',
-                        brand:  '#c0392b',
-                        kgreen: '#27ae60',
-                        kgray:  '#555555',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        input:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px #fff inset; }
-    </style>
-</head>
-<body class="min-h-screen bg-white dark:bg-gray-900">
-
-<div class="flex min-h-screen">
-
-    {{-- Left: form panel --}}
-    <div class="relative w-full lg:w-[52%] flex flex-col justify-center px-8 sm:px-14 xl:px-20 py-12 bg-white dark:bg-gray-800">
-
-        {{-- Theme toggle button (top-right of left panel) --}}
-        <div class="absolute top-4 right-4">
-            <button id="themeBtn" onclick="cycleTheme()" title="Toggle theme"
-                class="text-lg w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                ⚙️
-            </button>
-        </div>
-
-        <div class="max-w-sm w-full mx-auto">
-
-            {{-- Flash messages --}}
-            @if(session('success'))
-                <div class="mb-5 bg-green-50 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-800 dark:text-green-300 rounded-lg px-4 py-3 text-sm">
-                    ✓ {{ session('success') }}
-                </div>
-            @endif
-            @if(session('error'))
-                <div class="mb-5 bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-800 dark:text-red-300 rounded-lg px-4 py-3 text-sm">
-                    {{ session('error') }}
-                </div>
-            @endif
-            @if(session('info'))
-                <div class="mb-5 bg-blue-50 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-300 rounded-lg px-4 py-3 text-sm">
-                    {{ session('info') }}
-                </div>
-            @endif
-
-            @yield('form')
-
-        </div>
-    </div>
-
-    {{-- Right: photo panel --}}
-    <div class="hidden lg:block lg:w-[48%] relative overflow-hidden">
-        <img src="/images/auth-bg.jpg" alt="KZS Reunion"
-             class="absolute inset-0 w-full h-full object-cover">
-        {{-- gradient overlay so the photo never clashes with white text if added later --}}
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/10 to-teal-700/10"></div>
-    </div>
-
-</div>
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<title>@yield('title', 'কুষ্টিয়া জিলা স্কুল ব্যাচ-২০০২')</title>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('css/kzs.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js" defer></script>
+<script src="{{ asset('js/kzs-lang.js') }}" defer></script>
 <script>
-function _getTheme(){return localStorage.getItem('theme')||'auto';}
-function _applyTheme(t){
-    if(t==='dark') document.documentElement.classList.add('dark');
-    else if(t==='light') document.documentElement.classList.remove('dark');
-    else { window.matchMedia('(prefers-color-scheme:dark)').matches ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark'); }
-}
-function cycleTheme(){
-    var order=['light','dark','auto'], icons={light:'☀️',dark:'🌙',auto:'⚙️'};
-    var next=order[(order.indexOf(_getTheme())+1)%3];
-    next==='auto'?localStorage.removeItem('theme'):localStorage.setItem('theme',next);
-    _applyTheme(next);
-    var el=document.getElementById('themeBtn');
-    if(el) el.textContent=icons[next];
-}
 (function(){
-    var icons={light:'☀️',dark:'🌙',auto:'⚙️'};
-    var el=document.getElementById('themeBtn');
-    if(el) el.textContent=icons[_getTheme()];
+  var t=localStorage.getItem('kzs_theme')||'light';
+  if(t==='dark') document.documentElement.classList.add('dark');
+  else document.documentElement.classList.remove('dark');
 })();
 </script>
+</head>
+<body>
+
+{{-- ── HEADER ── --}}
+<header class="site-header">
+  <div class="wrap hdr">
+    <a href="{{ route('home') }}" class="brand" aria-label="KZS02">
+      <img src="{{ asset('images/kzs02-logo.png') }}" alt="KZS 2002 লোগো" height="40">
+      <span class="brand-text">
+        <strong data-en="Kushtia Zilla School Batch-2002">কুষ্টিয়া জিলা স্কুল ব্যাচ-২০০২</strong>
+      </span>
+    </a>
+    <div class="lang" role="group" aria-label="Language / ভাষা">
+      <button type="button" class="lang-btn" data-lang="bn" aria-pressed="true">বাংলা</button>
+      <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <div class="lang" role="group" aria-label="Theme">
+      <button type="button" class="lang-btn" id="themeBtnAuto"  onclick="setTheme('auto')"  aria-pressed="true">🔆</button>
+      <button type="button" class="lang-btn" id="themeBtnLight" onclick="setTheme('light')" aria-pressed="false">☀️</button>
+      <button type="button" class="lang-btn" id="themeBtnDark"  onclick="setTheme('dark')"  aria-pressed="false">🌙</button>
+    </div>
+    <a href="{{ route('login') }}" class="btn btn-ghost btn-sm"><i data-lucide="lock" width="15" height="15"></i><span data-en="Member Login">সদস্য লগইন</span></a>
+    <a href="{{ route('register') }}" class="btn btn-primary btn-sm" data-en="Join Us">সদস্য হোন</a>
+    <button class="icon-btn" id="menuBtn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <i data-lucide="menu" width="20" height="20"></i>
+    </button>
+    <nav class="nav" id="mainNav" aria-label="Main">
+      <a href="{{ route('home') }}#home" data-en="Home">হোম</a>
+      <a href="{{ route('home') }}#about" data-en="About Us">আমাদের সম্পর্কে</a>
+      <a href="{{ route('home') }}#activities" data-en="Activities">কার্যক্রম</a>
+      <a href="{{ route('home') }}#gallery" data-en="Gallery">ছবিঘর</a>
+      <a href="{{ route('home') }}#organogram" data-en="Organogram">অর্গানোগ্রাম</a>
+      <a href="{{ route('home') }}#reunion" data-en="Reunion">রিইউনিয়ন</a>
+      <a href="{{ route('home') }}#contact" data-en="Contact">যোগাযোগ</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+@yield('content')
+</main>
+
+{{-- ── FOOTER ── --}}
+<footer id="contact" class="site-footer">
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <span class="foot-logo"><img src="{{ asset('images/kzs02-logo.png') }}" alt="KZS 2002" height="34"></span>
+        <p class="foot-slogan" data-en="Unity, Friendship and Progress">ঐক্য, বন্ধুত্ব ও প্রগতি</p>
+        <p data-en="A non-political social welfare organization of the former students of the Kushtia Zilla School SSC 2002 batch.">কুষ্টিয়া জিলা স্কুল এসএসসি ২০০২ ব্যাচের প্রাক্তন ছাত্রদের একটি অরাজনৈতিক ও সামাজিক কল্যাণমূলক সংগঠন।</p>
+      </div>
+      <div>
+        <h4 data-en="Quick Links">দ্রুত লিংক</h4>
+        <ul>
+          <li><a href="{{ route('home') }}#about" data-en="About Us">আমাদের সম্পর্কে</a></li>
+          <li><a href="{{ route('home') }}#activities" data-en="Activities">কার্যক্রম</a></li>
+          <li><a href="{{ route('home') }}#gallery" data-en="Gallery">ছবিঘর</a></li>
+          <li><a href="{{ route('home') }}#organogram" data-en="Organogram">অর্গানোগ্রাম</a></li>
+          <li><a href="{{ route('home') }}#reunion" data-en="Reunion">রিইউনিয়ন</a></li>
+          <li><a href="{{ route('register') }}" data-en="Member Registration">সদস্য রেজিস্ট্রেশন</a></li>
+          <li><a href="{{ route('login') }}" data-en="Member Login">সদস্য লগইন</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-en="Contact">যোগাযোগ</h4>
+        <p class="cline"><i data-lucide="map-pin" width="16" height="16"></i><span data-en="Kushtia Zilla School, Kushtia, Bangladesh">কুষ্টিয়া জিলা স্কুল, কুষ্টিয়া, বাংলাদেশ</span></p>
+        <p class="cline"><i data-lucide="mail" width="16" height="16"></i><span>admin@kzs02.com</span></p>
+        <p class="cline"><i data-lucide="phone" width="16" height="16"></i><span>+880 1717-058286</span></p>
+      </div>
+    </div>
+    <p class="copy" data-en="&copy; {{ date('Y') }} Kushtia Zilla School Batch-2002. All rights reserved.">&copy; {{ date('Y') }} কুষ্টিয়া জিলা স্কুল ব্যাচ-২০০২। সর্বস্বত্ব সংরক্ষিত।</p>
+  </div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.lucide) lucide.createIcons();
+});
+function toggleMobileMenu(){var n=document.getElementById('mainNav');if(n)n.classList.toggle('mob-open');}
+document.addEventListener('click',function(e){var n=document.getElementById('mainNav'),b=document.getElementById('menuBtn');if(n&&b&&!n.contains(e.target)&&!b.contains(e.target))n.classList.remove('mob-open');});
+function _getTheme(){return localStorage.getItem('kzs_theme')||'light';}
+function _applyTheme(t){
+  var isDark=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme:dark)').matches);
+  isDark?document.documentElement.classList.add('dark'):document.documentElement.classList.remove('dark');
+  var ba=document.getElementById('themeBtnAuto'),bl=document.getElementById('themeBtnLight'),bd=document.getElementById('themeBtnDark');
+  if(ba)ba.setAttribute('aria-pressed',t==='auto'?'true':'false');
+  if(bl)bl.setAttribute('aria-pressed',t==='light'?'true':'false');
+  if(bd)bd.setAttribute('aria-pressed',t==='dark'?'true':'false');
+}
+function setTheme(t){
+  localStorage.setItem('kzs_theme',t);
+  _applyTheme(t);
+}
+(function(){_applyTheme(_getTheme());})();
+document.addEventListener('DOMContentLoaded',function(){_applyTheme(_getTheme());});
+</script>
+@stack('scripts')
 </body>
 </html>

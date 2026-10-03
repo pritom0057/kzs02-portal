@@ -20,9 +20,7 @@ use App\Http\Controllers\WallNotificationController;
 use Illuminate\Support\Facades\Route;
 
 // Public
-Route::get('/', function () {
-    return auth()->check() ? redirect()->route('dashboard') : view('welcome');
-})->name('home');
+Route::get('/', fn () => view('welcome'))->name('home');
 
 // Serve storage files without needing storage:link symlink (cPanel shared hosting)
 Route::get('/storage/{path}', function ($path) {
@@ -92,8 +90,9 @@ Route::middleware(['auth', 'alumni.verified'])->group(function () {
     Route::get('/wall/notifications', [WallNotificationController::class, 'index'])->name('wall.notifications');
     Route::post('/wall/notifications/read', [WallNotificationController::class, 'markRead'])->name('wall.notifications.read');
 
-    // Theme preference
+    // Theme & language preference
     Route::post('/settings/theme', [ProfileController::class, 'saveTheme'])->name('settings.theme');
+    Route::post('/settings/lang',  [ProfileController::class, 'saveLang'])->name('settings.lang');
 
     // Payment
     Route::get('/payment/confirm', [PaymentController::class, 'confirm'])->name('payment.confirm');

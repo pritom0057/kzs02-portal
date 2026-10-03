@@ -1,77 +1,80 @@
 @extends('layouts.app')
-@section('title', 'Event Registration — KZS 2002 Reunion')
+@section('title', 'ইভেন্ট রেজিস্ট্রেশন — KZS 2002')
 
 @section('content')
 @php
-    $reg = $registration;
-    $childrenDetails = $reg?->children_details ?? [];
-    $guestsDetails   = $reg?->guests_details ?? [];
+  $reg = $registration;
+  $childrenDetails = $reg?->children_details ?? [];
+  $guestsDetails   = $reg?->guests_details ?? [];
 @endphp
 
-<div class="max-w-5xl mx-auto">
+<div class="m-main">
+<div class="wrap" style="max-width:860px;margin-inline:auto">
 
   {{-- Banner --}}
-  <div class="rounded-2xl overflow-hidden mb-6 shadow">
-    <img src="{{ asset('images/cover.jpg') }}" alt="KZS 2002 Silver Jubilee Reunion" class="w-full object-cover">
+  <div style="border-radius:12px;overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow)">
+    <img src="{{ asset('images/cover.jpg') }}" alt="KZS 2002 Silver Jubilee Reunion" style="width:100%;object-fit:cover;display:block">
   </div>
 
-  <div class="flex items-center justify-between mb-6">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
     <div>
-      <h1 class="text-2xl font-bold text-primary">Silver Jubilee Event Registration</h1>
-      <p class="text-gray-400 dark:text-gray-500 text-sm">KZS 2002 SSC Batch — Celebrating 25 Years of Unity</p>
+      <h1 class="m-title" style="font-size:22px" data-en="Silver Jubilee Event Registration">সিলভার জুবিলি ইভেন্ট রেজিস্ট্রেশন</h1>
+      <p style="color:var(--muted);font-size:13px" data-en="KZS 2002 SSC Batch — Celebrating 25 Years of Unity">KZS ২০০২ SSC ব্যাচ — ঐক্যের ২৫ বছর উদযাপন</p>
     </div>
-    <a href="{{ route('dashboard') }}" class="text-sm text-gray-400 dark:text-gray-500 hover:text-kgreen transition">&larr; Dashboard</a>
+    <a href="{{ route('dashboard') }}" style="font-size:13px;color:var(--muted);text-decoration:none" data-en="← Dashboard">← ড্যাশবোর্ড</a>
   </div>
 
   @if($reg)
-  <div class="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 text-green-700 dark:text-green-300 text-sm rounded-lg px-4 py-3 mb-5 flex items-center gap-2">
+  <div style="background:#f0fdf4;border:1px solid #86efac;color:#166534;font-size:13px;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:8px">
     <i class="fa-solid fa-circle-check"></i>
-    You are already registered. Update your details below.
+    <span data-en="You are already registered. Update your details below.">আপনি ইতিমধ্যে রেজিস্ট্রেশন করেছেন। নিচে আপডেট করতে পারবেন।</span>
     @if($reg->payment_status === 'paid')
-      <span class="ml-auto font-bold text-green-800 dark:text-green-200">✅ Payment Confirmed — ৳{{ number_format($reg->total_amount, 0) }}</span>
+      <span style="margin-left:auto;font-weight:700;color:#14532d">✅ পেমেন্ট নিশ্চিত — ৳{{ number_format($reg->total_amount, 0) }}</span>
     @endif
   </div>
   @endif
 
-  <form method="POST" action="{{ route('event.save') }}" enctype="multipart/form-data" class="space-y-5" id="regForm">
+  <form method="POST" action="{{ route('event.save') }}" enctype="multipart/form-data" style="display:grid;gap:16px" id="regForm">
     @csrf
 
     {{-- SECTION 1: Schooling --}}
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-      <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-gray-100 dark:border-gray-700">
-        <div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-primary flex items-center justify-center"><i class="fa-solid fa-school text-sm"></i></div>
+    <div class="panel">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line)">
+        <div style="width:32px;height:32px;border-radius:8px;background:var(--tint);color:var(--red-700);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fa-solid fa-school" style="font-size:13px"></i>
+        </div>
         <div>
-          <h2 class="text-sm font-bold text-kgray dark:text-gray-200 uppercase tracking-wide">1. Schooling Information at KZS</h2>
-          <p class="text-xs text-gray-400 dark:text-gray-500">Your class and shift records at Kushtia Zilla School Batch '02</p>
+          <h2 style="font-size:12px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.06em" data-en="1. Schooling Information at KZS">১. KZS-এ স্কুলের তথ্য</h2>
+          <p style="font-size:11px;color:var(--muted)" data-en="Your class and shift records at Kushtia Zilla School Batch '02">কুষ্টিয়া জিলা স্কুল ব্যাচ '০২-এ আপনার শ্রেণি ও শিফট</p>
         </div>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Studied Up To <span class="text-brand">*</span></label>
-          <select name="school_class" required class="w-full border @error('school_class') border-red-400 @else border-gray-300 dark:border-gray-600 @enderror dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
-            <option value="" disabled {{ !old('school_class', $alumni->school_class) ? 'selected' : '' }}>Select Class</option>
+          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Studied Up To *">কত ক্লাস পর্যন্ত <span style="color:var(--red-700)">*</span></label>
+          <select name="school_class" required style="@error('school_class') border-color:var(--red-700); @enderror">
+            <option value="" disabled {{ !old('school_class', $alumni->school_class) ? 'selected' : '' }} data-en="Select Class">ক্লাস বেছে নিন</option>
             @foreach(['Class 10 (Completed SSC 2002)','Class 9','Class 8','Class 7','Class 6','Class 5','Class 4','Class 3'] as $cls)
               <option value="{{ $cls }}" {{ old('school_class', $alumni->school_class) === $cls ? 'selected' : '' }}>{{ $cls }}</option>
             @endforeach
           </select>
-          @error('school_class') <p class="text-brand text-xs mt-1">{{ $message }}</p> @enderror
+          @error('school_class') <p style="color:var(--red-700);font-size:11px;margin-top:3px">{{ $message }}</p> @enderror
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">School Shift <span class="text-brand">*</span></label>
-          <div class="flex gap-2">
+          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="School Shift *">শিফট <span style="color:var(--red-700)">*</span></label>
+          <div style="display:flex;gap:8px">
             @foreach(['Morning' => 'Morning', 'Day' => 'Day'] as $val => $label)
-            <label class="cursor-pointer flex-1">
-              <input type="radio" name="school_shift" value="{{ $val }}" class="sr-only peer"
+            <label class="shift-opt" style="flex:1;cursor:pointer">
+              <input type="radio" name="school_shift" value="{{ $val }}" style="display:none"
                 {{ old('school_shift', $alumni->school_shift) === $val ? 'checked' : '' }} required>
-              <span class="block text-center border-2 border-gray-200 dark:border-gray-600 dark:text-gray-300 rounded-lg px-3 py-2.5 text-sm font-semibold peer-checked:border-kgreen peer-checked:text-kgreen peer-checked:bg-green-50 dark:peer-checked:bg-green-900/30 transition select-none">{{ $label }}</span>
+              <div class="shift-face" style="text-align:center;border:2px solid var(--line);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--muted);user-select:none;transition:.15s">{{ $label }}</div>
             </label>
             @endforeach
           </div>
-          @error('school_shift') <p class="text-brand text-xs mt-1">{{ $message }}</p> @enderror
+          @error('school_shift') <p style="color:var(--red-700);font-size:11px;margin-top:3px">{{ $message }}</p> @enderror
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section <span class="text-brand">*</span></label>
-          <select name="school_section" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
+          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Section *">সেকশন <span style="color:var(--red-700)">*</span></label>
+          <select name="school_section" required>
             <option value="B" {{ old('school_section', $alumni->section) !== 'A' ? 'selected' : '' }}>Section B (Batch Main)</option>
             <option value="A" {{ old('school_section', $alumni->section) === 'A' ? 'selected' : '' }}>Section A</option>
           </select>
@@ -80,418 +83,440 @@
     </div>
 
     {{-- SECTION 2: Personal & Professional --}}
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-      <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-gray-100 dark:border-gray-700">
-        <div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-primary flex items-center justify-center"><i class="fa-solid fa-user-graduate text-sm"></i></div>
+    <div class="panel">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line)">
+        <div style="width:32px;height:32px;border-radius:8px;background:var(--tint);color:var(--red-700);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fa-solid fa-user-graduate" style="font-size:13px"></i>
+        </div>
         <div>
-          <h2 class="text-sm font-bold text-kgray dark:text-gray-200 uppercase tracking-wide">2. Applicant Personal &amp; Professional Info</h2>
-          <p class="text-xs text-gray-400 dark:text-gray-500">Identity, bilingual name, T-shirt size, and professional details</p>
+          <h2 style="font-size:12px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.06em" data-en="2. Personal & Professional Info">২. ব্যক্তিগত ও পেশাগত তথ্য</h2>
+          <p style="font-size:11px;color:var(--muted)" data-en="Identity, bilingual name, T-shirt size, and professional details">পরিচিতি, দ্বিভাষিক নাম, টি-শার্ট সাইজ ও পেশার বিবরণ</p>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name (English)</label>
-          <input type="text" value="{{ $alumni->name }}" disabled
-            class="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed">
-          <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">Edit via <a href="{{ route('profile.edit') }}" class="text-kgreen underline">Profile page</a></p>
+          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Full Name (English)">পুরো নাম (ইংরেজিতে)</label>
+          <input type="text" value="{{ $alumni->name }}" disabled style="background:var(--tint);color:var(--muted);cursor:not-allowed">
+          <p style="font-size:11px;color:var(--muted);margin-top:3px" data-en="Edit via Profile page">
+            <a href="{{ route('profile.edit') }}" style="color:var(--red-700)" data-en="Profile page">প্রোফাইল পেজ</a> থেকে সম্পাদনা করুন
+          </p>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">সম্পূর্ণ নাম (বাংলায়) <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
+          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px">সম্পূর্ণ নাম (বাংলায়) <span style="color:var(--muted);font-size:11px;font-weight:400">(ঐচ্ছিক)</span></label>
           <input type="text" name="name_bn" value="{{ old('name_bn', $alumni->name_bn) }}"
-            placeholder="যেমন: মো: ইমরুল হাসান" style="font-family: 'Tiro Bangla', serif"
-            class="w-full border @error('name_bn') border-red-400 @else border-gray-300 dark:border-gray-600 @enderror dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
-          @error('name_bn') <p class="text-brand text-xs mt-1">{{ $message }}</p> @enderror
+            placeholder="যেমন: মো: ইমরুল হাসান" style="font-family:var(--f-body);@error('name_bn') border-color:var(--red-700); @enderror">
+          @error('name_bn') <p style="color:var(--red-700);font-size:11px;margin-top:3px">{{ $message }}</p> @enderror
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"><i class="fa-brands fa-whatsapp text-green-600 mr-1"></i>Mobile &amp; WhatsApp <span class="text-brand">*</span></label>
+          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px">
+            <i class="fa-brands fa-whatsapp" style="color:#16a34a"></i> Mobile &amp; WhatsApp <span style="color:var(--red-700)">*</span>
+          </label>
           <input type="tel" name="mobile" required value="{{ old('mobile', $alumni->mobile ?? $alumni->phone) }}"
-            placeholder="+880 17XXXXXXXX"
-            class="w-full border @error('mobile') border-red-400 @else border-gray-300 dark:border-gray-600 @enderror dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
-          @error('mobile') <p class="text-brand text-xs mt-1">{{ $message }}</p> @enderror
+            placeholder="+880 17XXXXXXXX" style="@error('mobile') border-color:var(--red-700); @enderror">
+          @error('mobile') <p style="color:var(--red-700);font-size:11px;margin-top:3px">{{ $message }}</p> @enderror
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"><i class="fa-solid fa-phone-volume text-red-400 mr-1"></i>Emergency Contact <span class="text-brand">*</span></label>
+          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px">
+            <i class="fa-solid fa-phone-volume" style="color:var(--red-700)"></i> Emergency Contact <span style="color:var(--red-700)">*</span>
+          </label>
           <input type="tel" name="emergency_contact" required value="{{ old('emergency_contact', $alumni->emergency_contact) }}"
-            placeholder="+880 18XXXXXXXX"
-            class="w-full border @error('emergency_contact') border-red-400 @else border-gray-300 dark:border-gray-600 @enderror dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
-          @error('emergency_contact') <p class="text-brand text-xs mt-1">{{ $message }}</p> @enderror
+            placeholder="+880 18XXXXXXXX" style="@error('emergency_contact') border-color:var(--red-700); @enderror">
+          @error('emergency_contact') <p style="color:var(--red-700);font-size:11px;margin-top:3px">{{ $message }}</p> @enderror
         </div>
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Highest Educational Qualification <span class="text-brand">*</span></label>
+        <div style="grid-column:1/-1">
+          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Highest Educational Qualification *">সর্বোচ্চ শিক্ষাগত যোগ্যতা <span style="color:var(--red-700)">*</span></label>
           <input type="text" name="higher_education" required value="{{ old('higher_education', $alumni->higher_education) }}"
             placeholder="e.g. B.Sc in EEE (BUET) / MBA (DU) / MBBS"
-            class="w-full border @error('higher_education') border-red-400 @else border-gray-300 dark:border-gray-600 @enderror dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
-          @error('higher_education') <p class="text-brand text-xs mt-1">{{ $message }}</p> @enderror
+            style="@error('higher_education') border-color:var(--red-700); @enderror">
+          @error('higher_education') <p style="color:var(--red-700);font-size:11px;margin-top:3px">{{ $message }}</p> @enderror
         </div>
       </div>
 
       {{-- T-Shirt Size --}}
-      <div class="mb-5">
-        <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
-          <div class="flex flex-col sm:flex-row">
-
-            {{-- T-shirt image --}}
-            <div class="relative sm:w-56 flex-shrink-0 bg-gray-50 dark:bg-gray-700/60 flex items-center justify-center p-4 border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-gray-700">
-              <img src="{{ asset('images/t-shirt.jpg') }}" alt="KZS 2002 Reunion T-Shirt"
-                   class="max-h-44 sm:max-h-52 w-auto object-contain drop-shadow-md">
-              <span class="absolute top-2.5 left-2.5 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wide uppercase">
-                Official Tee
-              </span>
-            </div>
-
-            {{-- Size picker --}}
-            <div class="flex-1 p-4 sm:p-5">
-              <div class="flex items-center justify-between mb-3">
-                <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                  <i class="fa-solid fa-shirt text-primary mr-1.5"></i>
-                  Reunion T-Shirt Size <span class="text-brand">*</span>
-                </p>
-                <span class="text-[10px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">Chest inches</span>
-              </div>
-
-              <div class="grid grid-cols-3 gap-2">
-                @foreach(['S' => '36"-38"','M' => '38"-40"','L' => '40"-42"','XL' => '42"-44"','XXL' => '44"-46"','XXXL' => '46"-48"'] as $size => $range)
-                <label class="cursor-pointer">
-                  <input type="radio" name="tshirt_size" value="{{ $size }}" class="sr-only peer"
-                    {{ old('tshirt_size', $reg?->tshirt_size ?? 'M') === $size ? 'checked' : '' }}>
-                  <span class="flex flex-col items-center justify-center border-2 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-xl py-2.5 px-1 text-center peer-checked:border-primary peer-checked:bg-primary/5 dark:peer-checked:bg-primary/15 peer-checked:text-primary transition select-none hover:border-gray-300 dark:hover:border-gray-500">
-                    <span class="font-bold text-sm">{{ $size }}</span>
-                    <span class="text-[10px] opacity-70 mt-0.5 leading-tight">{{ $range }}</span>
-                  </span>
-                </label>
-                @endforeach
-              </div>
-
-              @error('tshirt_size') <p class="text-brand text-xs mt-2">{{ $message }}</p> @enderror
-
-              <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-3 leading-relaxed">
-                <i class="fa fa-circle-info mr-1"></i>
-                Sizes are based on chest measurement. If between sizes, choose the larger one.
+      <div style="margin-bottom:20px;border:1px solid var(--line);border-radius:10px;overflow:hidden">
+        <div style="display:flex;flex-wrap:wrap">
+          <div style="width:200px;flex-shrink:0;background:var(--tint);display:flex;align-items:center;justify-content:center;padding:16px;border-right:1px solid var(--line)">
+            <img src="{{ asset('images/t-shirt.jpg') }}" alt="KZS 2002 Reunion T-Shirt" style="max-height:180px;width:auto;object-fit:contain">
+          </div>
+          <div style="flex:1;padding:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <p style="font-size:13px;font-weight:600;color:var(--ink)">
+                <i class="fa-solid fa-shirt" style="color:var(--red-700);margin-right:6px"></i>
+                <span data-en="Reunion T-Shirt Size *">রিইউনিয়ন টি-শার্ট সাইজ</span> <span style="color:var(--red-700)">*</span>
               </p>
+              <span style="font-size:10px;color:var(--muted);background:var(--tint);padding:2px 8px;border-radius:99px" data-en="Chest inches">বুকের ইঞ্চি</span>
             </div>
-
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px">
+              @foreach(['S' => '36"-38"','M' => '38"-40"','L' => '40"-42"','XL' => '42"-44"','XXL' => '44"-46"','XXXL' => '46"-48"'] as $size => $range)
+              <label class="size-opt" style="cursor:pointer" onclick="selectSize(this,'{{ $size }}')">
+                <input type="radio" name="tshirt_size" value="{{ $size }}" style="display:none"
+                  {{ old('tshirt_size', $reg?->tshirt_size ?? 'M') === $size ? 'checked' : '' }}>
+                <div class="size-face" style="border:2px solid var(--line);border-radius:10px;padding:10px 4px;text-align:center;user-select:none;transition:.15s">
+                  <span style="font-size:13px;font-weight:700;display:block;color:var(--ink)">{{ $size }}</span>
+                  <span style="font-size:10px;display:block;color:var(--muted);margin-top:2px">{{ $range }}</span>
+                </div>
+              </label>
+              @endforeach
+            </div>
+            @error('tshirt_size') <p style="color:var(--red-700);font-size:11px;margin-top:8px">{{ $message }}</p> @enderror
+            <p style="font-size:11px;color:var(--muted);margin-top:10px" data-en="Sizes are based on chest measurement. If between sizes, choose the larger one.">
+              <i class="fa fa-circle-info" style="margin-right:4px"></i>সাইজ বুকের মাপে। দুটির মাঝামাঝি হলে বড়টি বেছে নিন।
+            </p>
           </div>
         </div>
       </div>
 
       {{-- Professional --}}
-      <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-1.5"><i class="fa-solid fa-briefcase"></i> Professional Information</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div style="background:var(--tint);border-radius:8px;padding:14px">
+        <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px" data-en="Professional Information">
+          <i class="fa-solid fa-briefcase"></i> পেশাগত তথ্য
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Designation / Title <span class="text-brand">*</span></label>
+            <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Designation / Title *">পদবি <span style="color:var(--red-700)">*</span></label>
             <input type="text" name="designation" required value="{{ old('designation', $alumni->designation) }}"
               placeholder="e.g. Senior Software Engineer / Manager"
-              class="w-full border @error('designation') border-red-400 @else border-gray-300 dark:border-gray-600 @enderror rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen bg-white dark:bg-gray-700 dark:text-gray-200">
-            @error('designation') <p class="text-brand text-xs mt-1">{{ $message }}</p> @enderror
+              style="@error('designation') border-color:var(--red-700); @enderror">
+            @error('designation') <p style="color:var(--red-700);font-size:11px;margin-top:3px">{{ $message }}</p> @enderror
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Organization <span class="text-brand">*</span></label>
+            <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Organization *">প্রতিষ্ঠান <span style="color:var(--red-700)">*</span></label>
             <input type="text" name="organization" required value="{{ old('organization', $alumni->organization) }}"
               placeholder="e.g. Grameenphone / Tech Solutions Ltd."
-              class="w-full border @error('organization') border-red-400 @else border-gray-300 dark:border-gray-600 @enderror rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen bg-white dark:bg-gray-700 dark:text-gray-200">
-            @error('organization') <p class="text-brand text-xs mt-1">{{ $message }}</p> @enderror
+              style="@error('organization') border-color:var(--red-700); @enderror">
+            @error('organization') <p style="color:var(--red-700);font-size:11px;margin-top:3px">{{ $message }}</p> @enderror
           </div>
         </div>
       </div>
     </div>
 
     {{-- SECTION 3: Family & Guests --}}
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-      <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-gray-100 dark:border-gray-700">
-        <div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-primary flex items-center justify-center"><i class="fa-solid fa-people-roof text-sm"></i></div>
+    <div class="panel">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line)">
+        <div style="width:32px;height:32px;border-radius:8px;background:var(--tint);color:var(--red-700);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fa-solid fa-people-roof" style="font-size:13px"></i>
+        </div>
         <div>
-          <h2 class="text-sm font-bold text-kgray dark:text-gray-200 uppercase tracking-wide">3. Family &amp; Accompanying Persons</h2>
-          <p class="text-xs text-gray-400 dark:text-gray-500">ব্যাচের সদস্য (স্ত্রী ও সন্তান সহ) — ৳২,০০২ · গেস্ট (জনপ্রতি) — ৳১,০০০ · ড্রাইভার — ৳৫০০</p>
+          <h2 style="font-size:12px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.06em" data-en="3. Family & Accompanying Persons">৩. পরিবার ও সঙ্গীগণ</h2>
+          <p style="font-size:11px;color:var(--muted)">ব্যাচের সদস্য (স্ত্রী ও সন্তান সহ) — ৳২,০০২ · গেস্ট (জনপ্রতি) — ৳১,০০০ · ড্রাইভার — ৳৫০০</p>
         </div>
       </div>
 
-      <div class="space-y-5">
+      <div style="display:grid;gap:16px">
         {{-- Spouse --}}
-        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-          <label class="flex items-center gap-3 cursor-pointer mb-3">
-            <input type="checkbox" name="bring_spouse" id="bring_spouse" value="1" class="w-4 h-4 accent-kgreen"
+        <div style="background:var(--tint);border-radius:8px;padding:14px">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:12px">
+            <input type="checkbox" name="bring_spouse" id="bring_spouse" value="1" style="width:16px;height:16px;accent-color:var(--red-700)"
               onchange="calcFees()" {{ old('bring_spouse', $reg?->bring_spouse) ? 'checked' : '' }}>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300"><i class="fa-solid fa-heart text-red-400 mr-1"></i>Spouse Attending <span class="text-gray-400 dark:text-gray-500 font-normal">(included in base fee)</span></span>
+            <span style="font-size:13px;font-weight:500;color:var(--ink)">
+              <i class="fa-solid fa-heart" style="color:var(--red-700);margin-right:4px"></i>
+              <span data-en="Spouse Attending">স্ত্রী/স্বামী আসবেন</span>
+              <span style="color:var(--muted);font-weight:400;font-size:12px" data-en="(included in base fee)">(বেস ফি-তে অন্তর্ভুক্ত)</span>
+            </span>
           </label>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Spouse Name (English)</label>
-              <input type="text" name="spouse_name" value="{{ old('spouse_name', $reg?->spouse_name ?? $alumni->spouse_name) }}"
-                placeholder="Spouse full name"
-                class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen bg-white dark:bg-gray-700 dark:text-gray-200">
+              <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Spouse Name (English)">স্ত্রী/স্বামীর নাম (ইংরেজি)</label>
+              <input type="text" name="spouse_name" value="{{ old('spouse_name', $reg?->spouse_name ?? $alumni->spouse_name) }}" placeholder="Spouse full name">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">স্ত্রীর নাম (বাংলায়)</label>
+              <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px">স্ত্রীর নাম (বাংলায়)</label>
               <input type="text" name="spouse_name_bn" value="{{ old('spouse_name_bn', $reg?->spouse_name_bn) }}"
-                placeholder="স্ত্রীর সম্পূর্ণ নাম" style="font-family: 'Tiro Bangla', serif"
-                class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen bg-white dark:bg-gray-700 dark:text-gray-200">
+                placeholder="স্ত্রীর সম্পূর্ণ নাম" style="font-family:var(--f-body)">
             </div>
           </div>
         </div>
 
-        {{-- Children (dynamic) --}}
+        {{-- Children --}}
         <div>
-          <div class="flex items-center justify-between mb-3">
-            <p class="text-sm font-medium text-gray-700 dark:text-gray-300"><i class="fa-solid fa-child text-primary mr-1"></i>Children Attending <span class="text-gray-400 dark:text-gray-500 font-normal text-xs">(included in base fee)</span></p>
-            <button type="button" id="btnAddChild"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 text-xs font-semibold transition">
-              <i class="fa-solid fa-plus"></i> Add Child
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <p style="font-size:13px;font-weight:500;color:var(--ink)">
+              <i class="fa-solid fa-child" style="color:var(--red-700);margin-right:4px"></i>
+              <span data-en="Children Attending">সন্তান আসবে</span>
+              <span style="color:var(--muted);font-size:12px;font-weight:400" data-en="(included in base fee)">(বেস ফি-তে অন্তর্ভুক্ত)</span>
+            </p>
+            <button type="button" id="btnAddChild" class="btn btn-ghost btn-sm">
+              <i class="fa-solid fa-plus"></i> <span data-en="Add Child">সন্তান যোগ করুন</span>
             </button>
           </div>
-          <div id="childrenContainer" class="space-y-2.5">
-            {{-- Pre-fill from saved data --}}
+          <div id="childrenContainer" style="display:grid;gap:10px">
             @foreach($childrenDetails as $i => $child)
-            <div class="child-card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-3 space-y-2.5">
-              <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
-                <span class="text-xs font-bold text-kgray dark:text-gray-300 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-child text-primary"></i> Child Details</span>
-                <button type="button" class="remove-child text-xs font-semibold text-red-500 hover:text-red-700 flex items-center gap-1"><i class="fa-solid fa-trash-can"></i> Remove</button>
+            <div class="child-card" style="border:1px solid var(--line);border-radius:8px;padding:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px">
+                <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">
+                  <i class="fa-solid fa-child" style="color:var(--red-700)"></i> <span data-en="Child Details">সন্তানের বিবরণ</span>
+                </span>
+                <button type="button" class="remove-child" style="font-size:12px;color:var(--red-700);background:none;border:none;cursor:pointer;font-weight:600">
+                  <i class="fa-solid fa-trash-can"></i> <span data-en="Remove">সরান</span>
+                </button>
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Name (English) <span class="text-brand">*</span></label>
-                  <input type="text" name="children_details[{{ $i }}][name]" value="{{ $child['name'] ?? '' }}" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-kgreen" placeholder="e.g. Abrar Hasan"></div>
-                <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">নাম (বাংলায়)</label>
-                  <input type="text" name="children_details[{{ $i }}][name_bn]" value="{{ $child['name_bn'] ?? '' }}" style="font-family:'Tiro Bangla',serif" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-kgreen" placeholder="যেমন: আবরার হাসান"></div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">
+                <div>
+                  <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="Name (English) *">নাম (ইংরেজি) <span style="color:var(--red-700)">*</span></label>
+                  <input type="text" name="children_details[{{ $i }}][name]" value="{{ $child['name'] ?? '' }}" required placeholder="e.g. Abrar Hasan">
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px">নাম (বাংলায়)</label>
+                  <input type="text" name="children_details[{{ $i }}][name_bn]" value="{{ $child['name_bn'] ?? '' }}" style="font-family:var(--f-body)" placeholder="যেমন: আবরার হাসান">
+                </div>
               </div>
             </div>
             @endforeach
           </div>
-          <div id="emptyChildrenNotice" class="{{ count($childrenDetails) > 0 ? 'hidden' : '' }} text-center py-4 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-dashed border-gray-200 dark:border-gray-600">
-            No children added. Click <strong>+ Add Child</strong> if bringing kids.
+          <div id="emptyChildrenNotice" style="{{ count($childrenDetails) > 0 ? 'display:none' : '' }}text-align:center;padding:14px;font-size:12px;color:var(--muted);background:var(--tint);border-radius:8px;border:1px dashed var(--line);margin-top:8px">
+            <span data-en="No children added. Click + Add Child if bringing kids.">কোনো সন্তান যোগ হয়নি। যোগ করতে <strong>+ সন্তান যোগ করুন</strong> ক্লিক করুন।</span>
           </div>
         </div>
 
-        {{-- Guests (dynamic) --}}
+        {{-- Guests --}}
         <div>
-          <div class="flex items-center justify-between mb-3">
-            <p class="text-sm font-medium text-gray-700 dark:text-gray-300"><i class="fa-solid fa-users text-primary mr-1"></i>Additional Guests <span class="text-gray-400 dark:text-gray-500 font-normal text-xs">(+৳1,000 each)</span></p>
-            <button type="button" id="btnAddGuest"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 text-xs font-semibold transition">
-              <i class="fa-solid fa-user-plus"></i> Add Guest
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <p style="font-size:13px;font-weight:500;color:var(--ink)">
+              <i class="fa-solid fa-users" style="color:var(--red-700);margin-right:4px"></i>
+              <span data-en="Additional Guests">অতিরিক্ত গেস্ট</span>
+              <span style="color:var(--muted);font-size:12px;font-weight:400">(+৳১,০০০ জনপ্রতি)</span>
+            </p>
+            <button type="button" id="btnAddGuest" class="btn btn-ghost btn-sm">
+              <i class="fa-solid fa-user-plus"></i> <span data-en="Add Guest">গেস্ট যোগ করুন</span>
             </button>
           </div>
-          <div id="guestsContainer" class="space-y-2.5">
+          <div id="guestsContainer" style="display:grid;gap:10px">
             @foreach($guestsDetails as $i => $guest)
-            <div class="guest-card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-3 space-y-2.5">
-              <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
-                <span class="text-xs font-bold text-kgray dark:text-gray-300 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-user-plus text-primary"></i> Guest Details</span>
-                <button type="button" class="remove-guest text-xs font-semibold text-red-500 hover:text-red-700 flex items-center gap-1"><i class="fa-solid fa-trash-can"></i> Remove</button>
+            <div class="guest-card" style="border:1px solid var(--line);border-radius:8px;padding:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px">
+                <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">
+                  <i class="fa-solid fa-user-plus" style="color:var(--red-700)"></i> <span data-en="Guest Details">গেস্টের বিবরণ</span>
+                </span>
+                <button type="button" class="remove-guest" style="font-size:12px;color:var(--red-700);background:none;border:none;cursor:pointer;font-weight:600">
+                  <i class="fa-solid fa-trash-can"></i> <span data-en="Remove">সরান</span>
+                </button>
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Full Name <span class="text-brand">*</span></label>
-                  <input type="text" name="guests_details[{{ $i }}][name]" value="{{ $guest['name'] ?? '' }}" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-kgreen" placeholder="Full name"></div>
-                <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Relationship</label>
-                  <input type="text" name="guests_details[{{ $i }}][relationship]" value="{{ $guest['relationship'] ?? '' }}" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-kgreen" placeholder="e.g. Brother / Cousin"></div>
-                <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Contact Number</label>
-                  <input type="tel" name="guests_details[{{ $i }}][contact]" value="{{ $guest['contact'] ?? '' }}" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-kgreen" placeholder="+880 1XXXXXXXXX"></div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px">
+                <div>
+                  <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="Full Name *">পুরো নাম <span style="color:var(--red-700)">*</span></label>
+                  <input type="text" name="guests_details[{{ $i }}][name]" value="{{ $guest['name'] ?? '' }}" required placeholder="Full name">
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="Relationship">সম্পর্ক</label>
+                  <input type="text" name="guests_details[{{ $i }}][relationship]" value="{{ $guest['relationship'] ?? '' }}" placeholder="e.g. Brother">
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="Contact">যোগাযোগ</label>
+                  <input type="tel" name="guests_details[{{ $i }}][contact]" value="{{ $guest['contact'] ?? '' }}" placeholder="+880 1XXXXXXXXX">
+                </div>
               </div>
             </div>
             @endforeach
           </div>
-          <div id="emptyGuestsNotice" class="{{ count($guestsDetails) > 0 ? 'hidden' : '' }} text-center py-4 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-dashed border-gray-200 dark:border-gray-600">
-            No guests added. Click <strong>+ Add Guest</strong> to add.
+          <div id="emptyGuestsNotice" style="{{ count($guestsDetails) > 0 ? 'display:none' : '' }}text-align:center;padding:14px;font-size:12px;color:var(--muted);background:var(--tint);border-radius:8px;border:1px dashed var(--line);margin-top:8px">
+            <span data-en="No guests added.">কোনো গেস্ট যোগ হয়নি। <strong>+ গেস্ট যোগ করুন</strong> ক্লিক করুন।</span>
           </div>
         </div>
 
         {{-- Driver --}}
-        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
-          <label class="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" name="driver_included" id="driver_included" value="1" class="w-4 h-4 accent-kgreen"
+        <div style="background:var(--tint);border-radius:8px;padding:12px">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+            <input type="checkbox" name="driver_included" id="driver_included" value="1"
+              style="width:16px;height:16px;accent-color:var(--red-700)"
               onchange="calcFees()" {{ old('driver_included', $reg?->driver_included) ? 'checked' : '' }}>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300"><i class="fa-solid fa-car text-gray-400 mr-1"></i>Driver Entry &amp; Meal Pack <span class="text-gray-400 dark:text-gray-500 font-normal">(+৳500)</span></span>
+            <span style="font-size:13px;font-weight:500;color:var(--ink)">
+              <i class="fa-solid fa-car" style="color:var(--muted);margin-right:4px"></i>
+              <span data-en="Driver Entry & Meal Pack">ড্রাইভার প্রবেশ ও খাবার প্যাক</span>
+              <span style="color:var(--muted);font-weight:400">(+৳৫০০)</span>
+            </span>
           </label>
         </div>
 
         {{-- Donation --}}
-        <div class="border border-dashed border-kgreen/40 rounded-xl p-4 bg-green-50/40 dark:bg-green-900/10">
-          <div class="flex items-center gap-2 mb-3">
-            <i class="fa-solid fa-hand-holding-heart text-kgreen"></i>
-            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Donation</span>
+        <div style="border:1px dashed #86efac;border-radius:10px;padding:16px;background:#f0fdf4">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <i class="fa-solid fa-hand-holding-heart" style="color:#16a34a"></i>
+            <span style="font-size:13px;font-weight:600;color:var(--ink)" data-en="Donation">ডোনেশন</span>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="text-sm font-bold text-kgray dark:text-gray-300">৳</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:14px;font-weight:700;color:var(--muted)">৳</span>
             <input type="text" name="donation_amount" id="donation_amount"
               value="{{ old('donation_amount', $reg?->donation_amount > 0 ? $reg->donation_amount : '') }}"
-              oninput="calcFees()"
-              class="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen bg-white dark:bg-gray-700 dark:text-gray-200">
+              oninput="calcFees()" placeholder="0" style="flex:1">
           </div>
         </div>
       </div>
     </div>
 
     {{-- SECTION 4: Address --}}
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-      <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-gray-100 dark:border-gray-700">
-        <div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-primary flex items-center justify-center"><i class="fa-solid fa-map-location-dot text-sm"></i></div>
+    <div class="panel">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line)">
+        <div style="width:32px;height:32px;border-radius:8px;background:var(--tint);color:var(--red-700);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fa-solid fa-map-location-dot" style="font-size:13px"></i>
+        </div>
         <div>
-          <h2 class="text-sm font-bold text-kgray dark:text-gray-200 uppercase tracking-wide">4. Present &amp; Permanent Address</h2>
-          <p class="text-xs text-gray-400 dark:text-gray-500">Complete address with Thana, Upazilla, and District</p>
+          <h2 style="font-size:12px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.06em" data-en="4. Present & Permanent Address">৪. বর্তমান ও স্থায়ী ঠিকানা</h2>
+          <p style="font-size:11px;color:var(--muted)" data-en="Complete address with Thana, Upazilla, and District">থানা, উপজেলা ও জেলাসহ সম্পূর্ণ ঠিকানা</p>
         </div>
       </div>
 
       @php
-        // Format: "{road}, PO: {post}, {thana}, PC: {postcode}, {district}"
-        // Also handles legacy "PC:" / "Upazila:" prefix for existing data
         function parseAddr(string $addr): array {
-            $parts = ['road'=>'','post'=>'','thana'=>'','postcode'=>'','district'=>''];
-            if (preg_match('/^(.*?),\s*PO:\s*(.*?),\s*(.*?),\s*(?:PC:|Upazilla?:)\s*(.*?),\s*(.*)$/', $addr, $m)) {
-                $parts = ['road'=>trim($m[1]),'post'=>trim($m[2]),'thana'=>trim($m[3]),'postcode'=>trim($m[4]),'district'=>trim($m[5])];
-            }
-            return $parts;
+          $parts = ['road'=>'','post'=>'','thana'=>'','postcode'=>'','district'=>''];
+          if (preg_match('/^(.*?),\s*PO:\s*(.*?),\s*(.*?),\s*(?:PC:|Upazilla?:)\s*(.*?),\s*(.*)$/', $addr, $m)) {
+            $parts = ['road'=>trim($m[1]),'post'=>trim($m[2]),'thana'=>trim($m[3]),'postcode'=>trim($m[4]),'district'=>trim($m[5])];
+          }
+          return $parts;
         }
         $pres = parseAddr($alumni->present_address ?? '');
         $perm = parseAddr($alumni->permanent_address ?? '');
       @endphp
 
-      {{-- Present Address --}}
-      <div class="mb-6">
-        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">Present Address</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-          <div class="sm:col-span-2">
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Village / Road / House <span class="text-brand">*</span></label>
+      <div style="margin-bottom:20px">
+        <p style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px" data-en="Present Address">বর্তমান ঠিকানা</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="Village / Road / House *">গ্রাম / রাস্তা / বাড়ি <span style="color:var(--red-700)">*</span></label>
             <input type="text" name="pres_road" required value="{{ old('pres_road', $pres['road']) }}" id="pres_road"
-              placeholder="House 12, Road 4, Court Para"
-              class="w-full border @error('pres_road') border-red-400 @else border-gray-300 dark:border-gray-600 @enderror dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
+              placeholder="House 12, Road 4" style="@error('pres_road') border-color:var(--red-700); @enderror">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Post Office <span class="text-brand">*</span></label>
+            <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="Post Office *">পোস্ট অফিস <span style="color:var(--red-700)">*</span></label>
             <input type="text" name="pres_post" required value="{{ old('pres_post', $pres['post']) }}" id="pres_post"
-              placeholder="e.g. Kushtia Head PO"
-              class="w-full border @error('pres_post') border-red-400 @else border-gray-300 dark:border-gray-600 @enderror dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
+              placeholder="Post Office" style="@error('pres_post') border-color:var(--red-700); @enderror">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Thana <span class="text-brand">*</span></label>
-            <input type="text" name="pres_thana" required value="{{ old('pres_thana', $pres['thana']) }}" id="pres_thana"
-              placeholder="e.g. Kushtia Sadar"
-              class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
+            <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="Thana *">থানা <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="pres_thana" required value="{{ old('pres_thana', $pres['thana']) }}" id="pres_thana" placeholder="Thana">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Upazilla <span class="text-brand">*</span></label>
-            <input type="text" name="pres_postcode" required value="{{ old('pres_postcode', $pres['postcode']) }}" id="pres_postcode"
-              placeholder="e.g. Kushtia Sadar"
-              class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
+            <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="Upazilla *">উপজেলা <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="pres_postcode" required value="{{ old('pres_postcode', $pres['postcode']) }}" id="pres_postcode" placeholder="Upazilla">
           </div>
-          <div class="sm:col-span-2">
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">District <span class="text-brand">*</span></label>
-            <input type="text" name="pres_district" required value="{{ old('pres_district', $pres['district']) }}" id="pres_district"
-              placeholder="Kushtia"
-              class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="District *">জেলা <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="pres_district" required value="{{ old('pres_district', $pres['district']) }}" id="pres_district" placeholder="District">
           </div>
         </div>
       </div>
 
-      {{-- Permanent Address --}}
       <div>
-        <div class="flex items-center justify-between mb-3">
-          <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Permanent Address</p>
-          <label class="inline-flex items-center gap-2 text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
-            <input type="checkbox" id="sameAddr" class="w-3.5 h-3.5 accent-kgreen"> Same as Present Address
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <p style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em" data-en="Permanent Address">স্থায়ী ঠিকানা</p>
+          <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;background:var(--tint);padding:5px 10px;border-radius:8px;border:1px solid var(--line)">
+            <input type="checkbox" id="sameAddr" style="width:14px;height:14px;accent-color:var(--red-700)">
+            <span data-en="Same as Present">বর্তমানের মতো</span>
           </label>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-          <div class="sm:col-span-2">
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Village / Road / House <span class="text-brand">*</span></label>
-            <input type="text" name="perm_road" required value="{{ old('perm_road', $perm['road']) }}" id="perm_road"
-              placeholder="Village / Road"
-              class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="Village / Road / House *">গ্রাম / রাস্তা / বাড়ি <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="perm_road" required value="{{ old('perm_road', $perm['road']) }}" id="perm_road" placeholder="Village / Road">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Post Office <span class="text-brand">*</span></label>
-            <input type="text" name="perm_post" required value="{{ old('perm_post', $perm['post']) }}" id="perm_post"
-              placeholder="Post Office"
-              class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
+            <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="Post Office *">পোস্ট অফিস <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="perm_post" required value="{{ old('perm_post', $perm['post']) }}" id="perm_post" placeholder="Post Office">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Thana <span class="text-brand">*</span></label>
-            <input type="text" name="perm_thana" required value="{{ old('perm_thana', $perm['thana']) }}" id="perm_thana"
-              placeholder="Thana"
-              class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
+            <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="Thana *">থানা <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="perm_thana" required value="{{ old('perm_thana', $perm['thana']) }}" id="perm_thana" placeholder="Thana">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Upazilla <span class="text-brand">*</span></label>
-            <input type="text" name="perm_postcode" required value="{{ old('perm_postcode', $perm['postcode']) }}" id="perm_postcode"
-              placeholder="e.g. Kushtia Sadar"
-              class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
+            <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="Upazilla *">উপজেলা <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="perm_postcode" required value="{{ old('perm_postcode', $perm['postcode']) }}" id="perm_postcode" placeholder="Upazilla">
           </div>
-          <div class="sm:col-span-2">
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">District <span class="text-brand">*</span></label>
-            <input type="text" name="perm_district" required value="{{ old('perm_district', $perm['district']) }}" id="perm_district"
-              placeholder="District"
-              class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px" data-en="District *">জেলা <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="perm_district" required value="{{ old('perm_district', $perm['district']) }}" id="perm_district" placeholder="District">
           </div>
         </div>
       </div>
     </div>
 
     {{-- SECTION 5: Photos --}}
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-      <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-gray-100 dark:border-gray-700">
-        <div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-primary flex items-center justify-center"><i class="fa-solid fa-camera text-sm"></i></div>
+    <div class="panel">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line)">
+        <div style="width:32px;height:32px;border-radius:8px;background:var(--tint);color:var(--red-700);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fa-solid fa-camera" style="font-size:13px"></i>
+        </div>
         <div>
-          <h2 class="text-sm font-bold text-kgray dark:text-gray-200 uppercase tracking-wide">5. Photographs Upload</h2>
-          <p class="text-xs text-gray-400 dark:text-gray-500">Passport photo and optional family picture for souvenir album</p>
+          <h2 style="font-size:12px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.06em" data-en="5. Photographs Upload">৫. ছবি আপলোড</h2>
+          <p style="font-size:11px;color:var(--muted)" data-en="Passport photo and optional family picture for souvenir album">পাসপোর্ট সাইজ ছবি ও ঐচ্ছিক পারিবারিক ছবি (স্মরণিকার জন্য)</p>
         </div>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {{-- Passport Photo --}}
-        <div class="border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-xl p-5 text-center hover:border-primary transition group">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        {{-- Passport --}}
+        <div style="border:2px dashed var(--line);border-radius:10px;padding:20px;text-align:center">
           @if($alumni->photo_url)
           @php $photoSrc = str_starts_with($alumni->photo_url, 'uploads/') ? asset($alumni->photo_url) : asset('storage/' . $alumni->photo_url); @endphp
-          <div class="mb-3"><img src="{{ $photoSrc }}" id="passport_preview" alt="Current Photo" class="w-24 h-28 mx-auto object-cover rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow"></div>
+          <div style="margin-bottom:12px"><img src="{{ $photoSrc }}" id="passport_preview" alt="Current Photo" style="width:80px;height:96px;margin:0 auto;object-fit:cover;border-radius:8px;border:2px solid var(--line);display:block"></div>
           @else
-          <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/30 text-primary flex items-center justify-center mx-auto mb-2" id="passport_icon"><i class="fa-solid fa-user-tie"></i></div>
+          <div id="passport_icon" style="width:40px;height:40px;border-radius:50%;background:var(--tint);color:var(--red-700);display:flex;align-items:center;justify-content:center;margin:0 auto 8px">
+            <i class="fa-solid fa-user-tie"></i>
+          </div>
           @endif
-          <p class="font-semibold text-sm text-gray-700 dark:text-gray-300">Passport Photo <span class="text-gray-400 dark:text-gray-500 font-normal text-xs">({{ $alumni->photo_url ? 'update' : 'required' }})</span></p>
-          <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Clear headshot · JPG/PNG · max 3MB</p>
+          <p style="font-size:13px;font-weight:600;color:var(--ink)" data-en="Passport Photo">পাসপোর্ট ছবি
+            <span style="color:var(--muted);font-size:11px;font-weight:400">({{ $alumni->photo_url ? 'আপডেট' : 'প্রয়োজনীয়' }})</span>
+          </p>
+          <p style="font-size:11px;color:var(--muted);margin-top:4px" data-en="Clear headshot · JPG/PNG · max 3MB">পরিষ্কার হেডশট · JPG/PNG · ৩ MB পর্যন্ত</p>
           <input type="file" name="passport_photo" id="passport_photo" accept="image/*" {{ !$alumni->photo_url ? 'required' : '' }}
-            class="hidden" onchange="previewUpload(this,'passport_preview','passport_icon')">
-          <label for="passport_photo" class="mt-3 inline-block cursor-pointer px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs font-semibold group-hover:bg-red-50 group-hover:border-primary group-hover:text-primary transition">Browse Image</label>
+            style="display:none" onchange="previewUpload(this,'passport_preview','passport_icon')">
+          <label for="passport_photo" style="display:inline-block;margin-top:10px;cursor:pointer;padding:6px 12px;border-radius:8px;background:var(--tint);border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink)" data-en="Browse Image">ছবি বেছে নিন</label>
         </div>
-        {{-- Family Photo --}}
-        <div class="border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-xl p-5 text-center hover:border-primary transition group">
+        {{-- Family --}}
+        <div style="border:2px dashed var(--line);border-radius:10px;padding:20px;text-align:center">
           @if($alumni->family_photo_url)
           @php $familySrc = str_starts_with($alumni->family_photo_url, 'uploads/') ? asset($alumni->family_photo_url) : asset('storage/' . $alumni->family_photo_url); @endphp
-          <div class="mb-3"><img src="{{ $familySrc }}" id="family_preview" alt="Family Photo" class="w-36 h-28 mx-auto object-cover rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow"></div>
+          <div style="margin-bottom:12px"><img src="{{ $familySrc }}" id="family_preview" alt="Family Photo" style="width:120px;height:96px;margin:0 auto;object-fit:cover;border-radius:8px;border:2px solid var(--line);display:block"></div>
           @else
-          <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/30 text-primary flex items-center justify-center mx-auto mb-2" id="family_icon"><i class="fa-solid fa-users-viewfinder"></i></div>
+          <div id="family_icon" style="width:40px;height:40px;border-radius:50%;background:var(--tint);color:var(--red-700);display:flex;align-items:center;justify-content:center;margin:0 auto 8px">
+            <i class="fa-solid fa-users-viewfinder"></i>
+          </div>
           @endif
-          <p class="font-semibold text-sm text-gray-700 dark:text-gray-300">Family Picture <span class="text-gray-400 dark:text-gray-500 font-normal">(Optional)</span></p>
-          <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">For the Reunion Souvenir Album</p>
-          <input type="file" name="family_photo" id="family_photo" accept="image/*" class="hidden"
+          <p style="font-size:13px;font-weight:600;color:var(--ink)" data-en="Family Picture">পারিবারিক ছবি
+            <span style="color:var(--muted);font-size:11px;font-weight:400" data-en="(Optional)">(ঐচ্ছিক)</span>
+          </p>
+          <p style="font-size:11px;color:var(--muted);margin-top:4px" data-en="For the Reunion Souvenir Album">রিইউনিয়ন স্মরণিকার জন্য</p>
+          <input type="file" name="family_photo" id="family_photo" accept="image/*" style="display:none"
             onchange="previewUpload(this,'family_preview','family_icon')">
-          <label for="family_photo" class="mt-3 inline-block cursor-pointer px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs font-semibold group-hover:bg-red-50 group-hover:border-primary group-hover:text-primary transition">Browse Image</label>
+          <label for="family_photo" style="display:inline-block;margin-top:10px;cursor:pointer;padding:6px 12px;border-radius:8px;background:var(--tint);border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink)" data-en="Browse Image">ছবি বেছে নিন</label>
         </div>
       </div>
     </div>
 
-    {{-- SECTION 6: Fee Summary (bg-kgray is already dark — left as-is) --}}
-    <div class="bg-kgray text-white rounded-xl p-5">
-      <p class="text-xs font-semibold text-white/60 uppercase tracking-wide mb-3 flex items-center gap-1.5"><i class="fa-solid fa-calculator"></i> Registration Fee</p>
-      <div class="space-y-2 text-sm">
-        <div class="flex justify-between"><span>ব্যাচের সদস্য (স্ত্রী ও সন্তান সহ)</span><span class="font-bold">৳ 2,002</span></div>
-        <div class="flex justify-between text-white/50"><span>+ গেস্ট (জনপ্রতি)</span><span>৳ 1,000</span></div>
-        <div class="flex justify-between text-white/50"><span>+ ড্রাইভার</span><span>৳ 500</span></div>
-        <div class="flex justify-between text-white/50"><span>+ Donation</span><span id="donationDisplay">৳ 0</span></div>
+    {{-- SECTION 6: Fee Summary --}}
+    <div style="background:var(--red-950,#3b0a12);color:#fff;border-radius:12px;padding:20px">
+      <p style="font-size:11px;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:6px" data-en="Registration Fee">
+        <i class="fa-solid fa-calculator"></i> রেজিস্ট্রেশন ফি
+      </p>
+      <div style="display:grid;gap:8px;font-size:13px">
+        <div style="display:flex;justify-content:space-between"><span data-en="Member (spouse & children included)">ব্যাচের সদস্য (স্ত্রী ও সন্তান সহ)</span><span style="font-weight:700">৳ 2,002</span></div>
+        <div style="display:flex;justify-content:space-between;color:rgba(255,255,255,.5)"><span data-en="+ Guest (each)">+ গেস্ট (জনপ্রতি)</span><span>৳ 1,000</span></div>
+        <div style="display:flex;justify-content:space-between;color:rgba(255,255,255,.5)"><span data-en="+ Driver">+ ড্রাইভার</span><span>৳ 500</span></div>
+        <div style="display:flex;justify-content:space-between;color:rgba(255,255,255,.5)"><span data-en="+ Donation">+ ডোনেশন</span><span id="donationDisplay">৳ 0</span></div>
       </div>
-      <div class="mt-3 pt-3 border-t border-white/10 grid grid-cols-2 gap-2 text-xs">
-        <div class="flex justify-between"><span class="text-white/50">Children: <span id="childCountDisplay" class="text-white font-bold">{{ count($childrenDetails) }}</span></span><span class="text-white/70" id="childSubtotal">{{ count($childrenDetails) > 0 ? 'Included' : '+ ৳ 0' }}</span></div>
-        <div class="flex justify-between"><span class="text-white/50">Guests: <span id="guestCountDisplay" class="text-white font-bold">{{ count($guestsDetails) }}</span></span><span class="text-white/70" id="guestSubtotal">+ ৳ {{ count($guestsDetails) * 1000 }}</span></div>
-      </div>
-      <div class="mt-4 pt-3 border-t border-white/20 flex justify-between items-baseline">
-        <div>
-          <span class="text-xs text-white/50 uppercase tracking-wide font-semibold">Total Payable</span>
-          <p class="text-xs text-white/40 mt-0.5" id="feeBreakdown">ব্যাচের সদস্য (৳2,002)</p>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1);display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:rgba(255,255,255,.5)" data-en="Children:">সন্তান: <span id="childCountDisplay" style="color:#fff;font-weight:700">{{ count($childrenDetails) }}</span></span>
+          <span style="color:rgba(255,255,255,.7)" id="childSubtotal">{{ count($childrenDetails) > 0 ? 'Included' : '+ ৳ 0' }}</span>
         </div>
-        <span class="text-2xl font-bold text-kgreen" id="grandTotal">৳ {{ number_format($reg ? $reg->total_amount : 2002, 0) }}</span>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:rgba(255,255,255,.5)" data-en="Guests:">গেস্ট: <span id="guestCountDisplay" style="color:#fff;font-weight:700">{{ count($guestsDetails) }}</span></span>
+          <span style="color:rgba(255,255,255,.7)" id="guestSubtotal">+ ৳ {{ count($guestsDetails) * 1000 }}</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.2);display:flex;justify-content:space-between;align-items:flex-end">
+        <div>
+          <span style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em;font-weight:600" data-en="Total Payable">মোট পরিশোধযোগ্য</span>
+          <p style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px" id="feeBreakdown">ব্যাচের সদস্য (৳2,002)</p>
+        </div>
+        <span style="font-size:26px;font-weight:700;color:#4ade80" id="grandTotal">৳ {{ number_format($reg ? $reg->total_amount : 2002, 0) }}</span>
       </div>
     </div>
 
     {{-- Submit --}}
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
-      <button type="submit" class="w-full bg-primary text-white font-semibold py-3 rounded-xl hover:opacity-90 transition text-base flex items-center justify-center gap-2">
+    <div class="panel">
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;font-size:15px;padding:13px">
         <i class="fa-solid fa-floppy-disk"></i>
-        {{ $reg ? 'Update Registration' : 'Save Registration' }} &amp; Proceed to Payment →
+        <span data-en="{{ $reg ? 'Update Registration' : 'Save Registration' }} & Proceed to Payment →">
+          {{ $reg ? 'রেজিস্ট্রেশন আপডেট' : 'রেজিস্ট্রেশন সংরক্ষণ' }} → পেমেন্টে যান
+        </span>
       </button>
     </div>
 
@@ -506,115 +531,157 @@
     $hasPending  = $reg->payment_status === 'pending';
     $needsMore   = $balanceDue > 0 && !$hasPending;
   @endphp
-  <div class="mt-5">
+  <div style="margin-top:16px">
     @if($fullyPaid)
-    <div class="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-xl p-5 flex items-center gap-3">
-      <span class="text-2xl">✅</span>
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:20px;display:flex;align-items:center;gap:12px">
+      <span style="font-size:28px">✅</span>
       <div>
-        <p class="font-semibold text-green-800 dark:text-green-200 text-sm">Payment Confirmed — ৳{{ number_format($reg->total_amount, 0) }}</p>
-        <p class="text-green-700 dark:text-green-300 text-xs">Your spot at the reunion is secured. Method: {{ strtoupper($reg->payment_method ?? 'SSLCommerz') }}</p>
+        <p style="font-weight:600;color:#166534;font-size:14px" data-en="Payment Confirmed">পেমেন্ট নিশ্চিত — ৳{{ number_format($reg->total_amount, 0) }}</p>
+        <p style="color:#15803d;font-size:12px" data-en="Your spot at the reunion is secured.">রিইউনিয়নে আপনার স্থান নিশ্চিত। পদ্ধতি: {{ strtoupper($reg->payment_method ?? 'SSLCommerz') }}</p>
       </div>
     </div>
     @elseif($hasPending)
-    <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-xl p-5">
-      <p class="font-semibold text-blue-800 dark:text-blue-200 text-sm mb-1">⏳ Payment Pending Verification</p>
-      <p class="text-blue-700 dark:text-blue-300 text-xs">Reference: <strong>{{ $reg->payment_reference }}</strong> via {{ strtoupper($reg->payment_method ?? '—') }}. Admin will confirm shortly.</p>
+    <div style="background:#eff6ff;border:1px solid #93c5fd;border-radius:10px;padding:20px">
+      <p style="font-weight:600;color:#1e40af;font-size:14px;margin-bottom:4px" data-en="⏳ Payment Pending Verification">⏳ পেমেন্ট যাচাই চলছে</p>
+      <p style="color:#1d4ed8;font-size:12px">রেফারেন্স: <strong>{{ $reg->payment_reference }}</strong> — {{ strtoupper($reg->payment_method ?? '—') }}। অ্যাডমিন শীঘ্রই নিশ্চিত করবেন।</p>
       @if($paidAmount > 0)
-      <p class="text-blue-600 dark:text-blue-400 text-xs mt-1.5">Previously confirmed: <strong>৳{{ number_format($paidAmount) }}</strong> · Balance being verified: <strong>৳{{ number_format($balanceDue) }}</strong></p>
+      <p style="color:#1d4ed8;font-size:12px;margin-top:6px">পূর্বে নিশ্চিত: <strong>৳{{ number_format($paidAmount) }}</strong> · বাকি যাচাই: <strong>৳{{ number_format($balanceDue) }}</strong></p>
       @endif
     </div>
     @elseif($needsMore)
-    {{-- Additional payment required (guests added after initial payment) --}}
     @if($paidAmount > 0)
-    <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4 mb-4 flex items-start gap-3">
-      <span class="text-xl mt-0.5">⚠️</span>
+    <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px">
+      <span style="font-size:18px;margin-top:2px">⚠️</span>
       <div>
-        <p class="font-semibold text-amber-800 dark:text-amber-200 text-sm">Additional Payment Required</p>
-        <p class="text-amber-700 dark:text-amber-300 text-xs mt-0.5">
-          Already paid: <strong>৳{{ number_format($paidAmount) }}</strong> ·
-          New total: <strong>৳{{ number_format($reg->total_amount) }}</strong> ·
-          Balance due: <strong>৳{{ number_format($balanceDue) }}</strong>
+        <p style="font-weight:600;color:#92400e;font-size:13px" data-en="Additional Payment Required">অতিরিক্ত পেমেন্ট প্রয়োজন</p>
+        <p style="color:#b45309;font-size:12px;margin-top:3px">
+          পরিশোধিত: <strong>৳{{ number_format($paidAmount) }}</strong> ·
+          নতুন মোট: <strong>৳{{ number_format($reg->total_amount) }}</strong> ·
+          বাকি: <strong>৳{{ number_format($balanceDue) }}</strong>
         </p>
       </div>
     </div>
     @endif
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-5">
+    <div class="panel" style="display:grid;gap:16px">
       <div>
-        <p class="font-semibold text-kgray dark:text-gray-200 text-sm mb-0.5">
-          💳 {{ $paidAmount > 0 ? 'Additional Payment' : 'Payment Required' }} — ৳{{ number_format($balanceDue, 0) }}
+        <p style="font-weight:600;color:var(--ink);font-size:14px;margin-bottom:4px">
+          💳 {{ $paidAmount > 0 ? 'অতিরিক্ত পেমেন্ট' : 'পেমেন্ট প্রয়োজন' }} — ৳{{ number_format($balanceDue, 0) }}
         </p>
-        <p class="text-gray-400 dark:text-gray-500 text-xs">Choose your preferred payment method below.</p>
+        <p style="color:var(--muted);font-size:12px" data-en="Choose your preferred payment method below.">নিচে আপনার পছন্দের পেমেন্ট পদ্ধতি বেছে নিন।</p>
       </div>
 
-      {{-- Method Tabs (grid wraps on mobile) --}}
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <button type="button" class="pay-tab py-2.5 rounded-xl border-2 border-primary bg-red-50 dark:bg-red-900/20 text-center transition" data-tab="bkash">
-          <span class="font-extrabold text-sm block" style="color:#E2136E">bKash</span><span class="text-[10px] text-gray-400 dark:text-gray-500">Send Money</span>
+      {{-- Method Tabs --}}
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px">
+        <button type="button" class="pay-tab" data-tab="bkash"
+          style="padding:10px 4px;border-radius:10px;border:2px solid var(--red-700);background:var(--tint);text-align:center;cursor:pointer">
+          <span style="font-size:13px;font-weight:800;display:block;color:#E2136E">bKash</span>
+          <span style="font-size:10px;color:var(--muted)">Send Money</span>
         </button>
-        <button type="button" class="pay-tab py-2.5 rounded-xl border-2 border-gray-200 dark:border-gray-600 text-center hover:border-gray-300 dark:hover:border-gray-500 transition" data-tab="nagad">
-          <span class="font-extrabold text-sm block" style="color:#F7931E">Nagad</span><span class="text-[10px] text-gray-400 dark:text-gray-500">Send Money</span>
+        <button type="button" class="pay-tab" data-tab="nagad"
+          style="padding:10px 4px;border-radius:10px;border:2px solid var(--line);background:transparent;text-align:center;cursor:pointer">
+          <span style="font-size:13px;font-weight:800;display:block;color:#F7931E">Nagad</span>
+          <span style="font-size:10px;color:var(--muted)">Send Money</span>
         </button>
-        <button type="button" class="pay-tab py-2.5 rounded-xl border-2 border-gray-200 dark:border-gray-600 text-center hover:border-gray-300 dark:hover:border-gray-500 transition" data-tab="bank">
-          <span class="font-extrabold text-sm block" style="color:#0F52BA">Bank</span><span class="text-[10px] text-gray-400 dark:text-gray-500">Deposit</span>
+        <button type="button" class="pay-tab" data-tab="bank"
+          style="padding:10px 4px;border-radius:10px;border:2px solid var(--line);background:transparent;text-align:center;cursor:pointer">
+          <span style="font-size:13px;font-weight:800;display:block;color:#0F52BA">Bank</span>
+          <span style="font-size:10px;color:var(--muted)">Deposit</span>
         </button>
-        <a href="{{ route('payment.confirm') }}" class="py-2.5 rounded-xl border-2 border-gray-200 dark:border-gray-600 text-center hover:border-kgreen transition block">
-          <span class="font-extrabold text-sm block text-kgreen">Online</span><span class="text-[10px] text-gray-400 dark:text-gray-500">SSL / Card</span>
-        </a>
+        <button type="button" class="pay-tab" data-tab="rocket"
+          style="padding:10px 4px;border-radius:10px;border:2px solid var(--line);background:transparent;text-align:center;cursor:pointer">
+          <span style="font-size:13px;font-weight:800;display:block;color:#8B1A8B">Rocket</span>
+          <span style="font-size:10px;color:var(--muted)">Send Money</span>
+        </button>
       </div>
 
       {{-- bKash --}}
-      <div id="tab-bkash" class="pay-panel bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600 space-y-3">
-        <div class="text-xs text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-100 dark:border-gray-700 space-y-1.5">
-          <p>1. Open <strong>bKash App</strong> or dial <strong>*247#</strong></p>
-          <p>2. Select <strong>"Send Money"</strong> → <strong class="font-mono" style="color:#E2136E">+880 1711-740273</strong></p>
-          <p>3. Amount: <strong class="text-primary">৳ {{ number_format($balanceDue, 0) }}</strong></p>
-          <p>4. Reference: your <strong>name or phone number</strong></p>
+      <div id="tab-bkash" class="pay-panel" style="background:var(--tint);border-radius:10px;padding:16px;border:1px solid var(--line);display:grid;gap:12px">
+        <div style="font-size:12px;color:var(--muted);background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--line);display:grid;gap:6px">
+          <p>1. <strong>bKash App</strong> খুলুন বা <strong>*247#</strong> ডায়াল করুন</p>
+          <p>2. <strong>"Send Money"</strong> → <strong style="color:#E2136E;font-family:monospace">+880 1711-740273</strong></p>
+          <p>3. পরিমাণ: <strong style="color:var(--red-700)">৳ {{ number_format($balanceDue, 0) }}</strong></p>
+          <p>4. রেফারেন্স: আপনার <strong>নাম বা ফোন নম্বর</strong></p>
         </div>
-        <form method="POST" action="{{ route('payment.manual') }}" class="space-y-3">
+        <form method="POST" action="{{ route('payment.manual') }}" style="display:grid;gap:10px">
           @csrf
           <input type="hidden" name="payment_method" value="bkash">
-          <div><label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Sender bKash Mobile <span class="text-brand">*</span></label>
-            <input type="tel" name="sender_number" placeholder="01XXXXXXXXX" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen"></div>
-          <div><label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">bKash Transaction ID <span class="text-brand">*</span></label>
-            <input type="text" name="payment_reference" required placeholder="e.g. BL78X90A1" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-kgreen"></div>
-          <button type="submit" class="w-full py-2.5 rounded-xl text-white font-bold text-sm hover:opacity-90 transition" style="background:#E2136E">Verify &amp; Confirm bKash Payment</button>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px" data-en="Sender bKash Mobile *">প্রেরকের bKash নম্বর <span style="color:var(--red-700)">*</span></label>
+            <input type="tel" name="sender_number" placeholder="01XXXXXXXXX">
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px" data-en="bKash Transaction ID *">bKash ট্রানজেকশন ID <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="payment_reference" required placeholder="e.g. BL78X90A1" style="font-family:monospace;text-transform:uppercase">
+          </div>
+          <button type="submit" style="width:100%;padding:10px;border-radius:10px;color:#fff;font-weight:700;font-size:13px;border:none;cursor:pointer;background:#E2136E" data-en="Verify & Confirm bKash Payment">bKash পেমেন্ট নিশ্চিত করুন</button>
         </form>
       </div>
 
       {{-- Nagad --}}
-      <div id="tab-nagad" class="pay-panel hidden bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600 space-y-3">
-        <div class="text-xs text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-100 dark:border-gray-700 space-y-1.5">
-          <p>1. Open <strong>Nagad App</strong> or dial <strong>*167#</strong></p>
-          <p>2. Select <strong>"Send Money"</strong> → <strong class="font-mono" style="color:#F7931E">01912-345678</strong></p>
-          <p>3. Amount: <strong class="text-primary">৳ {{ number_format($balanceDue, 0) }}</strong></p>
+      <div id="tab-nagad" class="pay-panel" style="background:var(--tint);border-radius:10px;padding:16px;border:1px solid var(--line);display:none;gap:12px">
+        <div style="font-size:12px;color:var(--muted);background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--line);display:grid;gap:6px">
+          <p>1. <strong>Nagad App</strong> খুলুন বা <strong>*167#</strong> ডায়াল করুন</p>
+          <p>2. <strong>"Send Money"</strong> → <strong style="color:#F7931E;font-family:monospace">01912-345678</strong></p>
+          <p>3. পরিমাণ: <strong style="color:var(--red-700)">৳ {{ number_format($balanceDue, 0) }}</strong></p>
         </div>
-        <form method="POST" action="{{ route('payment.manual') }}" class="space-y-3">
+        <form method="POST" action="{{ route('payment.manual') }}" style="display:grid;gap:10px">
           @csrf
           <input type="hidden" name="payment_method" value="nagad">
-          <div><label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Sender Nagad Mobile <span class="text-brand">*</span></label>
-            <input type="tel" name="sender_number" placeholder="01XXXXXXXXX" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen"></div>
-          <div><label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Nagad Transaction ID <span class="text-brand">*</span></label>
-            <input type="text" name="payment_reference" required placeholder="e.g. 71A89KC01" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-kgreen"></div>
-          <button type="submit" class="w-full py-2.5 rounded-xl text-white font-bold text-sm hover:opacity-90 transition" style="background:#F7931E">Verify &amp; Confirm Nagad Payment</button>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">প্রেরকের Nagad নম্বর <span style="color:var(--red-700)">*</span></label>
+            <input type="tel" name="sender_number" placeholder="01XXXXXXXXX">
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">Nagad ট্রানজেকশন ID <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="payment_reference" required placeholder="e.g. 71A89KC01" style="font-family:monospace;text-transform:uppercase">
+          </div>
+          <button type="submit" style="width:100%;padding:10px;border-radius:10px;color:#fff;font-weight:700;font-size:13px;border:none;cursor:pointer;background:#F7931E">Nagad পেমেন্ট নিশ্চিত করুন</button>
         </form>
       </div>
 
       {{-- Bank --}}
-      <div id="tab-bank" class="pay-panel hidden bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600 space-y-3">
-        <div class="text-xs text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-100 dark:border-gray-700 space-y-1.5">
-          <p><strong>Bank:</strong> Dutch-Bangla Bank PLC / City Bank PLC</p>
-          <p><strong>Account Name:</strong> KZS BATCH 2002 REUNION FUND</p>
-          <p><strong>Account No.:</strong> 151.110.0098765</p>
-          <p><strong>Branch:</strong> Kushtia Branch (Routing: 090500123)</p>
+      <div id="tab-bank" class="pay-panel" style="background:var(--tint);border-radius:10px;padding:16px;border:1px solid var(--line);display:none;gap:12px">
+        <div style="font-size:12px;color:var(--muted);background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--line);display:grid;gap:6px">
+          <p><strong>ব্যাংক:</strong> Dutch-Bangla Bank PLC / City Bank PLC</p>
+          <p><strong>অ্যাকাউন্ট নাম:</strong> KZS BATCH 2002 REUNION FUND</p>
+          <p><strong>অ্যাকাউন্ট নম্বর:</strong> 151.110.0098765</p>
+          <p><strong>শাখা:</strong> Kushtia Branch (Routing: 090500123)</p>
         </div>
-        <form method="POST" action="{{ route('payment.manual') }}" class="space-y-3">
+        <form method="POST" action="{{ route('payment.manual') }}" style="display:grid;gap:10px">
           @csrf
           <input type="hidden" name="payment_method" value="bank_transfer">
-          <div><label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Depositor Bank &amp; Branch <span class="text-brand">*</span></label>
-            <input type="text" name="sender_number" placeholder="e.g. DBBL Kushtia / Online NPSB" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kgreen"></div>
-          <div><label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Deposit Slip / Transfer Ref <span class="text-brand">*</span></label>
-            <input type="text" name="payment_reference" required placeholder="e.g. FT26092500891" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-kgreen"></div>
-          <button type="submit" class="w-full py-2.5 rounded-xl text-white font-bold text-sm hover:opacity-90 transition" style="background:#0F52BA">Submit Bank Verification</button>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">জমাকারীর ব্যাংক ও শাখা <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="sender_number" placeholder="e.g. DBBL Kushtia / Online NPSB">
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">জমার স্লিপ / ট্রান্সফার রেফ <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="payment_reference" required placeholder="e.g. FT26092500891" style="font-family:monospace">
+          </div>
+          <button type="submit" style="width:100%;padding:10px;border-radius:10px;color:#fff;font-weight:700;font-size:13px;border:none;cursor:pointer;background:#0F52BA">ব্যাংক যাচাই জমা দিন</button>
+        </form>
+      </div>
+
+      {{-- Rocket --}}
+      <div id="tab-rocket" class="pay-panel" style="background:var(--tint);border-radius:10px;padding:16px;border:1px solid var(--line);display:none;gap:12px">
+        <div style="font-size:12px;color:var(--muted);background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--line);display:grid;gap:6px">
+          <p>1. <strong>Rocket App</strong> খুলুন বা <strong>*322#</strong> ডায়াল করুন</p>
+          <p>2. <strong>"Send Money"</strong> → <strong style="color:#8B1A8B;font-family:monospace">+880 1711-740273</strong></p>
+          <p>3. পরিমাণ: <strong style="color:var(--red-700)">৳ {{ number_format($balanceDue, 0) }}</strong></p>
+          <p>4. রেফারেন্স: আপনার <strong>নাম বা ফোন নম্বর</strong></p>
+        </div>
+        <form method="POST" action="{{ route('payment.manual') }}" style="display:grid;gap:10px">
+          @csrf
+          <input type="hidden" name="payment_method" value="rocket">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">প্রেরকের Rocket নম্বর <span style="color:var(--red-700)">*</span></label>
+            <input type="tel" name="sender_number" placeholder="01XXXXXXXXX">
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">Rocket ট্রানজেকশন ID <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="payment_reference" required placeholder="e.g. TXN1234567890" style="font-family:monospace;text-transform:uppercase">
+          </div>
+          <button type="submit" style="width:100%;padding:10px;border-radius:10px;color:#fff;font-weight:700;font-size:13px;border:none;cursor:pointer;background:#8B1A8B">Rocket পেমেন্ট নিশ্চিত করুন</button>
         </form>
       </div>
     </div>
@@ -623,143 +690,186 @@
   @endif
 
 </div>
+</div>
 
 <script>
-  // ── Photo preview ─────────────────────────────────────────────
-  function previewUpload(input, previewId, iconId) {
-    if (!input.files || !input.files[0]) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      let img = document.getElementById(previewId);
-      if (!img) {
-        img = document.createElement('img');
-        img.id = previewId;
-        img.className = 'w-24 h-28 mx-auto object-cover rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow mb-3';
-        const icon = document.getElementById(iconId);
-        if (icon) icon.replaceWith(img);
-        else input.parentElement.prepend(img);
-      }
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-
-  // ── Dynamic children ─────────────────────────────────────────
-  let childIdx = {{ count($childrenDetails) }};
-  document.getElementById('btnAddChild').addEventListener('click', () => {
-    const i = childIdx++;
-    const card = document.createElement('div');
-    card.className = 'child-card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-3 space-y-2.5';
-    card.innerHTML = `
-      <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
-        <span class="text-xs font-bold text-kgray dark:text-gray-300 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-child text-primary"></i> Child Details</span>
-        <button type="button" class="remove-child text-xs font-semibold text-red-500 hover:text-red-700 flex items-center gap-1"><i class="fa-solid fa-trash-can"></i> Remove</button>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Name (English) <span class="text-brand">*</span></label>
-          <input type="text" name="children_details[${i}][name]" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-kgreen" placeholder="e.g. Abrar Hasan"></div>
-        <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">নাম (বাংলায়)</label>
-          <input type="text" name="children_details[${i}][name_bn]" style="font-family:'Tiro Bangla',serif" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-kgreen" placeholder="যেমন: আবরার হাসান"></div>
-      </div>`;
-    card.querySelector('.remove-child').addEventListener('click', () => { card.remove(); calcFees(); });
-    document.getElementById('childrenContainer').appendChild(card);
-    document.getElementById('emptyChildrenNotice').classList.add('hidden');
-    calcFees();
-  });
-
-  // Wire pre-filled remove buttons
-  document.querySelectorAll('.remove-child').forEach(btn => {
-    btn.addEventListener('click', () => { btn.closest('.child-card').remove(); calcFees(); });
-  });
-
-  // ── Dynamic guests ────────────────────────────────────────────
-  let guestIdx = {{ count($guestsDetails) }};
-  document.getElementById('btnAddGuest').addEventListener('click', () => {
-    const i = guestIdx++;
-    const card = document.createElement('div');
-    card.className = 'guest-card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-3 space-y-2.5';
-    card.innerHTML = `
-      <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
-        <span class="text-xs font-bold text-kgray dark:text-gray-300 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-user-plus text-primary"></i> Guest Details</span>
-        <button type="button" class="remove-guest text-xs font-semibold text-red-500 hover:text-red-700 flex items-center gap-1"><i class="fa-solid fa-trash-can"></i> Remove</button>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-        <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Full Name <span class="text-brand">*</span></label>
-          <input type="text" name="guests_details[${i}][name]" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-kgreen" placeholder="Full name"></div>
-        <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Relationship</label>
-          <input type="text" name="guests_details[${i}][relationship]" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-kgreen" placeholder="e.g. Brother / Cousin"></div>
-        <div><label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Contact Number</label>
-          <input type="tel" name="guests_details[${i}][contact]" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-kgreen" placeholder="+880 1XXXXXXXXX"></div>
-      </div>`;
-    card.querySelector('.remove-guest').addEventListener('click', () => { card.remove(); calcFees(); });
-    document.getElementById('guestsContainer').appendChild(card);
-    document.getElementById('emptyGuestsNotice').classList.add('hidden');
-    calcFees();
-  });
-
-  document.querySelectorAll('.remove-guest').forEach(btn => {
-    btn.addEventListener('click', () => { btn.closest('.guest-card').remove(); calcFees(); });
-  });
-
-  // ── Same-address toggle ───────────────────────────────────────
-  const presIds = ['pres_road','pres_post','pres_thana','pres_postcode','pres_district'];
-  const permIds = ['perm_road','perm_post','perm_thana','perm_postcode','perm_district'];
-  document.getElementById('sameAddr').addEventListener('change', function() {
-    if (this.checked) {
-      permIds.forEach((id, i) => { document.getElementById(id).value = document.getElementById(presIds[i]).value; document.getElementById(id).readOnly = true; });
-    } else {
-      permIds.forEach(id => { document.getElementById(id).readOnly = false; });
+// ── Photo preview ─────────────────────────────────────────────────
+function previewUpload(input, previewId, iconId) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    let img = document.getElementById(previewId);
+    if (!img) {
+      img = document.createElement('img');
+      img.id = previewId;
+      img.style.cssText = 'width:80px;height:96px;margin:0 auto 12px;object-fit:cover;border-radius:8px;border:2px solid var(--line);display:block';
+      const icon = document.getElementById(iconId);
+      if (icon) icon.replaceWith(img);
+      else input.parentElement.prepend(img);
     }
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// ── Shift selector ────────────────────────────────────────────────
+function selectShift(label) {
+  document.querySelectorAll('.shift-opt .shift-face').forEach(f => {
+    f.style.borderColor = 'var(--line)';
+    f.style.background = '';
+    f.style.color = 'var(--muted)';
   });
-  presIds.forEach(id => document.getElementById(id).addEventListener('input', () => {
-    if (document.getElementById('sameAddr').checked) {
-      permIds.forEach((pid, i) => document.getElementById(pid).value = document.getElementById(presIds[i]).value);
-    }
-  }));
+  const face = label.querySelector('.shift-face');
+  face.style.borderColor = 'var(--red-700)';
+  face.style.background = 'var(--tint)';
+  face.style.color = 'var(--red-700)';
+  label.querySelector('input').checked = true;
+}
+document.querySelectorAll('.shift-opt').forEach(label => {
+  label.addEventListener('click', () => selectShift(label));
+  if (label.querySelector('input').checked) selectShift(label);
+});
 
-  // ── Live fee calculator ───────────────────────────────────────
-  function calcFees() {
-    const spouse   = document.getElementById('bring_spouse').checked;
-    const children = document.querySelectorAll('.child-card').length;
-    const guests   = document.querySelectorAll('.guest-card').length;
-    const driver   = document.getElementById('driver_included').checked;
-    const donation = parseInt(document.getElementById('donation_amount').value) || 0;
+// ── T-Shirt size selector ─────────────────────────────────────────
+function selectSize(label, size) {
+  document.querySelectorAll('.size-opt .size-face').forEach(f => {
+    f.style.borderColor = 'var(--line)';
+    f.style.background = '';
+  });
+  const face = label.querySelector('.size-face');
+  face.style.borderColor = 'var(--red-700)';
+  face.style.background = 'var(--tint)';
+  label.querySelector('input').checked = true;
+}
+document.querySelectorAll('.size-opt').forEach(label => {
+  if (label.querySelector('input').checked) selectSize(label, label.querySelector('input').value);
+});
 
-    // Base 2002 covers member + spouse + all children
-    const total = 2002 + (guests * 1000) + (driver ? 500 : 0) + donation;
-
-    document.getElementById('childCountDisplay').textContent  = children;
-    document.getElementById('childSubtotal').textContent     = children > 0 ? 'Included' : '+ ৳ 0';
-    document.getElementById('guestCountDisplay').textContent  = guests;
-    document.getElementById('guestSubtotal').textContent     = '+ ৳ ' + (guests * 1000).toLocaleString();
-    document.getElementById('donationDisplay').textContent   = '৳ ' + donation.toLocaleString();
-    document.getElementById('grandTotal').textContent        = '৳ ' + total.toLocaleString();
-
-    const parts = ['ব্যাচের সদস্য (৳2,002)'];
-    if (guests)    parts.push(`${guests} Guest(s) (৳${(guests*1000).toLocaleString()})`);
-    if (driver)    parts.push('Driver (৳500)');
-    if (donation)  parts.push(`Donation (৳${donation.toLocaleString()})`);
-    document.getElementById('feeBreakdown').textContent = parts.join(' + ');
-
-    document.getElementById('emptyChildrenNotice').classList.toggle('hidden', children > 0);
-    document.getElementById('emptyGuestsNotice').classList.toggle('hidden', guests > 0);
-  }
-
-  function setDonation(amount) {
-    document.getElementById('donation_amount').value = amount;
-    calcFees();
-  }
-
+// ── Dynamic children ──────────────────────────────────────────────
+let childIdx = {{ count($childrenDetails) }};
+document.getElementById('btnAddChild').addEventListener('click', () => {
+  const i = childIdx++;
+  const card = document.createElement('div');
+  card.className = 'child-card';
+  card.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:12px';
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px">
+      <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em"><i class="fa-solid fa-child" style="color:var(--red-700)"></i> সন্তানের বিবরণ</span>
+      <button type="button" class="remove-child" style="font-size:12px;color:var(--red-700);background:none;border:none;cursor:pointer;font-weight:600"><i class="fa-solid fa-trash-can"></i> সরান</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">
+      <div>
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px">নাম (ইংরেজি) <span style="color:var(--red-700)">*</span></label>
+        <input type="text" name="children_details[${i}][name]" required placeholder="e.g. Abrar Hasan">
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px">নাম (বাংলায়)</label>
+        <input type="text" name="children_details[${i}][name_bn]" style="font-family:var(--f-body)" placeholder="যেমন: আবরার হাসান">
+      </div>
+    </div>`;
+  card.querySelector('.remove-child').addEventListener('click', () => { card.remove(); calcFees(); });
+  document.getElementById('childrenContainer').appendChild(card);
+  document.getElementById('emptyChildrenNotice').style.display = 'none';
   calcFees();
+});
 
-  // ── Payment method tabs ───────────────────────────────────────
-  document.querySelectorAll('.pay-tab').forEach(btn => {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.pay-tab').forEach(b => b.className = 'pay-tab py-2.5 rounded-xl border-2 border-gray-200 dark:border-gray-600 text-center hover:border-gray-300 dark:hover:border-gray-500 transition');
-      this.className = 'pay-tab py-2.5 rounded-xl border-2 border-primary bg-red-50 dark:bg-red-900/20 text-center transition';
-      document.querySelectorAll('.pay-panel').forEach(p => p.classList.add('hidden'));
-      document.getElementById('tab-' + this.dataset.tab).classList.remove('hidden');
+document.querySelectorAll('.remove-child').forEach(btn => {
+  btn.addEventListener('click', () => { btn.closest('.child-card').remove(); calcFees(); });
+});
+
+// ── Dynamic guests ────────────────────────────────────────────────
+let guestIdx = {{ count($guestsDetails) }};
+document.getElementById('btnAddGuest').addEventListener('click', () => {
+  const i = guestIdx++;
+  const card = document.createElement('div');
+  card.className = 'guest-card';
+  card.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:12px';
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px">
+      <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em"><i class="fa-solid fa-user-plus" style="color:var(--red-700)"></i> গেস্টের বিবরণ</span>
+      <button type="button" class="remove-guest" style="font-size:12px;color:var(--red-700);background:none;border:none;cursor:pointer;font-weight:600"><i class="fa-solid fa-trash-can"></i> সরান</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px">
+      <div>
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px">পুরো নাম <span style="color:var(--red-700)">*</span></label>
+        <input type="text" name="guests_details[${i}][name]" required placeholder="Full name">
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px">সম্পর্ক</label>
+        <input type="text" name="guests_details[${i}][relationship]" placeholder="e.g. Brother">
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px">যোগাযোগ</label>
+        <input type="tel" name="guests_details[${i}][contact]" placeholder="+880 1XXXXXXXXX">
+      </div>
+    </div>`;
+  card.querySelector('.remove-guest').addEventListener('click', () => { card.remove(); calcFees(); });
+  document.getElementById('guestsContainer').appendChild(card);
+  document.getElementById('emptyGuestsNotice').style.display = 'none';
+  calcFees();
+});
+
+document.querySelectorAll('.remove-guest').forEach(btn => {
+  btn.addEventListener('click', () => { btn.closest('.guest-card').remove(); calcFees(); });
+});
+
+// ── Same-address toggle ───────────────────────────────────────────
+const presIds = ['pres_road','pres_post','pres_thana','pres_postcode','pres_district'];
+const permIds = ['perm_road','perm_post','perm_thana','perm_postcode','perm_district'];
+document.getElementById('sameAddr').addEventListener('change', function() {
+  if (this.checked) {
+    permIds.forEach((id, i) => { document.getElementById(id).value = document.getElementById(presIds[i]).value; document.getElementById(id).readOnly = true; });
+  } else {
+    permIds.forEach(id => { document.getElementById(id).readOnly = false; });
+  }
+});
+presIds.forEach(id => document.getElementById(id).addEventListener('input', () => {
+  if (document.getElementById('sameAddr').checked) {
+    permIds.forEach((pid, i) => document.getElementById(pid).value = document.getElementById(presIds[i]).value);
+  }
+}));
+
+// ── Live fee calculator ───────────────────────────────────────────
+function calcFees() {
+  const children = document.querySelectorAll('.child-card').length;
+  const guests   = document.querySelectorAll('.guest-card').length;
+  const driver   = document.getElementById('driver_included').checked;
+  const donation = parseInt(document.getElementById('donation_amount').value) || 0;
+  const total    = 2002 + (guests * 1000) + (driver ? 500 : 0) + donation;
+
+  document.getElementById('childCountDisplay').textContent = children;
+  document.getElementById('childSubtotal').textContent     = children > 0 ? 'Included' : '+ ৳ 0';
+  document.getElementById('guestCountDisplay').textContent = guests;
+  document.getElementById('guestSubtotal').textContent     = '+ ৳ ' + (guests * 1000).toLocaleString();
+  document.getElementById('donationDisplay').textContent   = '৳ ' + donation.toLocaleString();
+  document.getElementById('grandTotal').textContent        = '৳ ' + total.toLocaleString();
+
+  const parts = ['ব্যাচের সদস্য (৳2,002)'];
+  if (guests)   parts.push(`${guests} গেস্ট (৳${(guests * 1000).toLocaleString()})`);
+  if (driver)   parts.push('ড্রাইভার (৳500)');
+  if (donation) parts.push(`ডোনেশন (৳${donation.toLocaleString()})`);
+  document.getElementById('feeBreakdown').textContent = parts.join(' + ');
+
+  const emptyChildren = document.getElementById('emptyChildrenNotice');
+  const emptyGuests   = document.getElementById('emptyGuestsNotice');
+  if (emptyChildren) emptyChildren.style.display = children > 0 ? 'none' : '';
+  if (emptyGuests)   emptyGuests.style.display   = guests > 0 ? 'none' : '';
+}
+
+calcFees();
+
+// ── Payment method tabs ───────────────────────────────────────────
+document.querySelectorAll('.pay-tab').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.pay-tab').forEach(b => {
+      b.style.borderColor = 'var(--line)';
+      b.style.background = 'transparent';
     });
+    this.style.borderColor = 'var(--red-700)';
+    this.style.background = 'var(--tint)';
+    document.querySelectorAll('.pay-panel').forEach(p => p.style.display = 'none');
+    document.getElementById('tab-' + this.dataset.tab).style.display = 'grid';
   });
+});
 </script>
 @endsection

@@ -93,4 +93,13 @@ class ProfileController extends Controller
         auth()->user()->update(['theme' => $request->theme]);
         return response()->json(['success' => true]);
     }
+
+    public function saveLang(Request $request)
+    {
+        $request->validate(['lang' => 'required|in:bn,en']);
+        if (auth()->check()) {
+            auth()->user()->update(['lang' => $request->lang]);
+        }
+        return response()->json(['success' => true]);
+    }
 }
