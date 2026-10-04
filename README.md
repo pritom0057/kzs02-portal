@@ -54,7 +54,7 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Edit `.env` with your database credentials, mail config, and SSLCommerz keys, then:
+Edit `.env` with your database credentials and mail config, then:
 
 ```bash
 php artisan migrate
@@ -102,10 +102,6 @@ MAIL_HOST=
 MAIL_PORT=
 MAIL_USERNAME=
 MAIL_PASSWORD=
-
-SSLCZ_STORE_ID=
-SSLCZ_STORE_PASSWD=
-SSLCZ_IS_SANDBOX=false
 ```
 
 ---
