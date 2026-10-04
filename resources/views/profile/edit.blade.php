@@ -210,11 +210,11 @@
       <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px" data-en="Family">পরিবার</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div>
-          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Spouse Name">স্ত্রী/স্বামীর নাম</label>
+          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Wife's Name">স্ত্রীর নাম</label>
           <input type="text" name="spouse_name" value="{{ old('spouse_name', $alumni->spouse_name) }}">
         </div>
         <div>
-          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Spouse Contact">স্ত্রী/স্বামীর যোগাযোগ</label>
+          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Wife's Contact">স্ত্রীর যোগাযোগ</label>
           <input type="text" name="spouse_contact" value="{{ old('spouse_contact', $alumni->spouse_contact) }}">
         </div>
       </div>

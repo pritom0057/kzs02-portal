@@ -35,7 +35,7 @@
         </div>
         <div style="padding-bottom:2px;padding-top:48px;min-width:0">
           <h1 class="m-title" style="font-size:20px;word-break:break-word;color:var(--ink)">{{ $user->name }}</h1>
-          <p style="font-size:13px;color:var(--muted)">KZS · SSC ব্যাচ ২০০২</p>
+          <p style="font-size:13px;color:var(--muted)" data-en="KZS · SSC Batch 2002">KZS · SSC ব্যাচ ২০০২</p>
         </div>
       </div>
       <a href="{{ route('profile.edit') }}" class="btn btn-ghost btn-sm" style="margin-bottom:4px">

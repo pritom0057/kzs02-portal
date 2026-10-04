@@ -424,3 +424,5 @@ html.dark .nav { background: var(--surface); }
 html.dark .lang { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.15); }
 html.dark .lang-btn { color: rgba(255,255,255,.6); }
 html.dark .lang-btn[aria-pressed="true"] { background: var(--red-700); color: #fff; }
+html.dark .lead { color: #d4b4b4; }
+html.dark .hero h1 { color: #e8c8c8; }
