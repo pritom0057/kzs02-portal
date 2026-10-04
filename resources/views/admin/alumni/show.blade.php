@@ -129,6 +129,57 @@
         </div>
       </dl>
 
+      {{-- Attendees breakdown --}}
+      @php
+        try {
+          $bringSpouse  = (bool) $reg->getAttribute('bring_spouse');
+          $driverIncl   = (bool) $reg->getAttribute('driver_included');
+          $childrenList = is_array($reg->children_details) ? $reg->children_details : [];
+          $guestsList   = is_array($reg->guests_details)   ? $reg->guests_details   : [];
+          $spouseName   = $reg->getAttribute('spouse_name') ?: '—';
+          $spouseNameBn = $reg->getAttribute('spouse_name_bn');
+          $hasAttendees = $bringSpouse || count($childrenList) || count($guestsList) || $driverIncl;
+        } catch (\Throwable $e) {
+          $hasAttendees = false; $bringSpouse = false; $driverIncl = false;
+          $childrenList = []; $guestsList = []; $spouseName = ''; $spouseNameBn = '';
+        }
+      @endphp
+      @if($hasAttendees)
+      <div style="margin-bottom:14px;padding:10px 12px;background:var(--tint);border-radius:8px;font-size:12px">
+        <p style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Attendees</p>
+        <ul style="list-style:none;padding:0;margin:0;display:grid;gap:6px">
+          <li style="display:flex;gap:8px">
+            <span style="color:var(--muted);min-width:56px;flex-shrink:0">Alumni</span>
+            <span style="color:var(--ink);font-weight:600">{{ $alumnus->name }}</span>
+          </li>
+          @if($bringSpouse)
+          <li style="display:flex;gap:8px">
+            <span style="color:var(--muted);min-width:56px;flex-shrink:0">Spouse</span>
+            <span style="color:var(--ink)">{{ $spouseName }}{{ $spouseNameBn ? ' ('.$spouseNameBn.')' : '' }}</span>
+          </li>
+          @endif
+          @foreach($childrenList as $i => $child)
+          <li style="display:flex;gap:8px">
+            <span style="color:var(--muted);min-width:56px;flex-shrink:0">Child {{ $i + 1 }}</span>
+            <span style="color:var(--ink)">{{ ($child['name'] ?? '—').(!empty($child['name_bn']) ? ' ('.$child['name_bn'].')' : '') }}</span>
+          </li>
+          @endforeach
+          @foreach($guestsList as $i => $guest)
+          <li style="display:flex;gap:8px">
+            <span style="color:var(--muted);min-width:56px;flex-shrink:0">Guest {{ $i + 1 }}</span>
+            <span style="color:var(--ink)">{{ ($guest['name'] ?? '—').(!empty($guest['relationship']) ? ' ('.$guest['relationship'].')' : '').(!empty($guest['contact']) ? ' · '.$guest['contact'] : '') }}</span>
+          </li>
+          @endforeach
+          @if($driverIncl)
+          <li style="display:flex;gap:8px">
+            <span style="color:var(--muted);min-width:56px;flex-shrink:0">Driver</span>
+            <span style="color:var(--ink)">Included</span>
+          </li>
+          @endif
+        </ul>
+      </div>
+      @endif
+
       <div style="border-top:1px solid var(--line);padding-top:12px;display:grid;gap:8px">
         @if($overpaid)
         <form method="POST" action="{{ route('admin.alumni.payment.adjust', $alumnus) }}">

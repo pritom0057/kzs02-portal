@@ -217,7 +217,7 @@
           </label>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
             <div>
-              <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Spouse Name (English)">স্ত্রী/স্বামীর নাম (ইংরেজি)</label>
+              <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Spouse Name (English)">স্ত্রীর নাম</label>
               <input type="text" name="spouse_name" value="{{ old('spouse_name', $reg?->spouse_name ?? $alumni->spouse_name) }}" placeholder="Spouse full name">
             </div>
             <div>
