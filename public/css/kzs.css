@@ -389,11 +389,13 @@ html.dark {
   --bg: #1c0a0b;
   --surface: #2b1214;
   --ink: #f0e6e6;
-  --muted: #b08888;
+  --muted: #c8a0a0;
   --line: #3d1a1b;
   --tint: #351315;
   --tint-2: #4d1e20;
   --shadow: 0 1px 4px rgba(0,0,0,.3), 0 14px 32px -14px rgba(0,0,0,.5);
+  --red-900: #e8a0a0;
+  --red-950: #1a0608;
 }
 html.dark body { background: var(--bg); color: var(--ink); }
 html.dark .site-header { background: rgba(28,10,11,.95); }
@@ -424,5 +426,9 @@ html.dark .nav { background: var(--surface); }
 html.dark .lang { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.15); }
 html.dark .lang-btn { color: rgba(255,255,255,.6); }
 html.dark .lang-btn[aria-pressed="true"] { background: var(--red-700); color: #fff; }
+html.dark .hero { background: radial-gradient(760px 420px at 90% -10%, rgba(237,28,36,.18), transparent 62%), linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%); }
 html.dark .lead { color: #d4b4b4; }
-html.dark .hero h1 { color: #e8c8c8; }
+html.dark .sec-head p,
+html.dark .about p,
+html.dark .reunion p,
+html.dark .card p { color: #c8a0a0; }
