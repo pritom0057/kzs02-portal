@@ -34,7 +34,7 @@
           @endif
         </div>
         <div style="padding-bottom:2px;padding-top:48px;min-width:0">
-          <h1 class="m-title" style="font-size:20px;word-break:break-word">{{ $user->name }}</h1>
+          <h1 class="m-title" style="font-size:20px;word-break:break-word;color:var(--ink)">{{ $user->name }}</h1>
           <p style="font-size:13px;color:var(--muted)">KZS · SSC ব্যাচ ২০০২</p>
         </div>
       </div>
