@@ -5,112 +5,94 @@
 @section('content')
 
 {{-- Tabs + search --}}
-<div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-5">
-    <div class="flex gap-1 text-sm">
-        @foreach(['pending' => 'Pending', 'verified' => 'Verified', 'rejected' => 'Rejected', 'all' => 'All'] as $key => $label)
-        <a href="{{ route('admin.alumni.index', ['status' => $key, 'search' => request('search')]) }}"
-            class="px-3 py-1.5 rounded-lg font-medium transition
-            {{ $status === $key
-                ? 'bg-primary text-white'
-                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50' }}">
-            {{ $label }}
-            <span class="ml-1 text-xs opacity-70">({{ $counts[$key] }})</span>
-        </a>
-        @endforeach
-    </div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px">
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    @foreach(['pending' => 'Pending', 'verified' => 'Verified', 'rejected' => 'Rejected', 'all' => 'All'] as $key => $label)
+    <a href="{{ route('admin.alumni.index', ['status' => $key, 'search' => request('search')]) }}"
+      style="display:inline-block;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;transition:.15s;
+      {{ $status === $key ? 'background:var(--red-700);color:#fff;' : 'background:#fff;color:var(--muted);border:1px solid var(--line);' }}">
+      {{ $label }}
+      <span style="opacity:.7;font-size:12px">({{ $counts[$key] }})</span>
+    </a>
+    @endforeach
+  </div>
 
-    <form method="GET" action="{{ route('admin.alumni.index') }}" class="flex gap-2 sm:ml-auto">
-        <input type="hidden" name="status" value="{{ $status }}">
-        <input type="text" name="search" value="{{ request('search') }}"
-            placeholder="Search name, roll, email…"
-            class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-52">
-        <button class="bg-primary text-white text-sm px-3 py-1.5 rounded-lg hover:bg-opacity-90 transition">
-            Search
-        </button>
-    </form>
+  <form method="GET" action="{{ route('admin.alumni.index') }}" style="display:flex;gap:8px;margin-left:auto">
+    <input type="hidden" name="status" value="{{ $status }}">
+    <input type="text" name="search" value="{{ request('search') }}"
+      placeholder="Search name, roll, email…" style="width:200px">
+    <button type="submit" class="btn btn-primary btn-sm">Search</button>
+  </form>
 </div>
 
 {{-- Table --}}
-<div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-    <table class="w-full text-sm">
-        <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
-            <tr>
-                <th class="px-4 py-3 text-left">Name</th>
-                <th class="px-4 py-3 text-left">Roll</th>
-                <th class="px-4 py-3 text-left hidden md:table-cell">Email</th>
-                <th class="px-4 py-3 text-left hidden lg:table-cell">Phone</th>
-                <th class="px-4 py-3 text-left">Status</th>
-                <th class="px-4 py-3 text-left hidden sm:table-cell">Joined</th>
-                <th class="px-4 py-3 text-right">Actions</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-            @forelse($alumni as $a)
-            <tr class="hover:bg-gray-50 transition">
-                <td class="px-4 py-3 font-medium text-gray-800">
-                    <a href="{{ route('admin.alumni.show', $a) }}" class="hover:text-primary hover:underline">
-                        {{ $a->name }}
-                    </a>
-                    @if($a->admin_notes_count > 0)
-                        <span class="ml-1 text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded">
-                            {{ $a->admin_notes_count }} note{{ $a->admin_notes_count > 1 ? 's' : '' }}
-                        </span>
-                    @endif
-                </td>
-                <td class="px-4 py-3 text-gray-500">{{ $a->roll_number }}</td>
-                <td class="px-4 py-3 text-gray-500 hidden md:table-cell">{{ $a->email }}</td>
-                <td class="px-4 py-3 text-gray-500 hidden lg:table-cell">{{ $a->phone ?: '—' }}</td>
-                <td class="px-4 py-3">
-                    <span class="inline-block text-xs font-semibold px-2 py-0.5 rounded-full
-                        {{ $a->status === 'verified' ? 'bg-green-100 text-green-700' :
-                           ($a->status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
-                        {{ ucfirst($a->status) }}
-                    </span>
-                </td>
-                <td class="px-4 py-3 text-gray-400 hidden sm:table-cell text-xs">
-                    {{ $a->created_at->format('d M Y') }}
-                </td>
-                <td class="px-4 py-3 text-right">
-                    <div class="flex justify-end gap-1">
-                        @if($a->status !== 'verified')
-                        <form method="POST" action="{{ route('admin.alumni.verify', $a) }}">
-                            @csrf
-                            <button class="text-xs bg-green-100 text-green-700 font-semibold px-2 py-1 rounded hover:bg-green-200 transition">
-                                Verify
-                            </button>
-                        </form>
-                        @endif
-                        @if($a->status !== 'rejected')
-                        <form method="POST" action="{{ route('admin.alumni.reject', $a) }}">
-                            @csrf
-                            <button class="text-xs bg-red-100 text-red-700 font-semibold px-2 py-1 rounded hover:bg-red-200 transition"
-                                onclick="return confirm('Reject {{ $a->name }}?')">
-                                Reject
-                            </button>
-                        </form>
-                        @endif
-                        <a href="{{ route('admin.alumni.show', $a) }}"
-                            class="text-xs bg-gray-100 text-gray-600 font-semibold px-2 py-1 rounded hover:bg-gray-200 transition">
-                            View
-                        </a>
-                    </div>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="7" class="px-4 py-8 text-center text-gray-400 text-sm">
-                    No alumni found.
-                </td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+<div class="tbl-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Roll</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Status</th>
+        <th>Joined</th>
+        <th style="text-align:right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @forelse($alumni as $a)
+      <tr>
+        <td style="font-weight:500;color:var(--ink)">
+          <a href="{{ route('admin.alumni.show', $a) }}" style="color:var(--red-700);text-decoration:none">
+            {{ $a->name }}
+          </a>
+          @if($a->admin_notes_count > 0)
+            <span class="badge badge-yellow" style="margin-left:6px;font-size:10px">
+              {{ $a->admin_notes_count }} note{{ $a->admin_notes_count > 1 ? 's' : '' }}
+            </span>
+          @endif
+        </td>
+        <td style="color:var(--muted)">{{ $a->roll_number }}</td>
+        <td style="color:var(--muted)">{{ $a->email }}</td>
+        <td style="color:var(--muted)">{{ $a->phone ?: '—' }}</td>
+        <td>
+          <span class="badge {{ $a->status === 'verified' ? 'badge-green' : ($a->status === 'rejected' ? 'badge-red' : 'badge-yellow') }}">
+            {{ ucfirst($a->status) }}
+          </span>
+        </td>
+        <td style="color:var(--muted);font-size:12px">{{ $a->created_at->format('d M Y') }}</td>
+        <td style="text-align:right">
+          <div style="display:flex;justify-content:flex-end;gap:6px">
+            @if($a->status !== 'verified')
+            <form method="POST" action="{{ route('admin.alumni.verify', $a) }}">
+              @csrf
+              <button class="btn btn-sm" style="background:#dcfce7;color:#166534;border-color:#86efac">✓ Verify</button>
+            </form>
+            @endif
+            @if($a->status !== 'rejected')
+            <form method="POST" action="{{ route('admin.alumni.reject', $a) }}">
+              @csrf
+              <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;border-color:#fca5a5"
+                onclick="return confirm('Reject {{ $a->name }}?')">✕ Reject</button>
+            </form>
+            @endif
+            <a href="{{ route('admin.alumni.show', $a) }}" class="btn btn-ghost btn-sm">View</a>
+          </div>
+        </td>
+      </tr>
+      @empty
+      <tr>
+        <td colspan="7" style="text-align:center;color:var(--muted);padding:32px">No alumni found.</td>
+      </tr>
+      @endforelse
+    </tbody>
+  </table>
 
-    @if($alumni->hasPages())
-    <div class="px-4 py-3 border-t border-gray-100 text-sm">
-        {{ $alumni->links() }}
-    </div>
-    @endif
+  @if($alumni->hasPages())
+  <div style="padding:12px 16px;border-top:1px solid var(--tint)">
+    {{ $alumni->links() }}
+  </div>
+  @endif
 </div>
 
 @endsection

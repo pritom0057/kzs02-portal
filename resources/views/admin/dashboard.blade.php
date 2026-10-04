@@ -5,58 +5,53 @@
 @section('content')
 
 {{-- Stat cards --}}
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-    @foreach([
-        ['label' => 'Total Alumni',   'value' => $stats['total'],      'color' => 'bg-gray-100 text-gray-700'],
-        ['label' => 'Pending',        'value' => $stats['pending'],     'color' => 'bg-yellow-100 text-yellow-700'],
-        ['label' => 'Verified',       'value' => $stats['verified'],    'color' => 'bg-green-100 text-green-700'],
-        ['label' => 'Rejected',       'value' => $stats['rejected'],    'color' => 'bg-red-100 text-red-700'],
-        ['label' => 'Event Reg.',     'value' => $stats['registered'],  'color' => 'bg-blue-100 text-blue-700'],
-        ['label' => 'Paid',           'value' => $stats['paid'],        'color' => 'bg-purple-100 text-purple-700'],
-    ] as $stat)
-    <div class="bg-white rounded-xl border border-gray-200 p-4">
-        <p class="text-xs text-gray-400 mb-1">{{ $stat['label'] }}</p>
-        <p class="text-2xl font-bold {{ $stat['color'] }} inline-block px-2 py-0.5 rounded">
-            {{ $stat['value'] }}
-        </p>
-    </div>
-    @endforeach
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:24px">
+  @foreach([
+    ['label' => 'Total Alumni',  'value' => $stats['total'],     'color' => '#374151', 'bg' => '#f3f4f6'],
+    ['label' => 'Pending',       'value' => $stats['pending'],    'color' => '#854d0e', 'bg' => '#fef9c3'],
+    ['label' => 'Verified',      'value' => $stats['verified'],   'color' => '#166534', 'bg' => '#dcfce7'],
+    ['label' => 'Rejected',      'value' => $stats['rejected'],   'color' => '#991b1b', 'bg' => '#fee2e2'],
+    ['label' => 'Event Reg.',    'value' => $stats['registered'], 'color' => '#1e40af', 'bg' => '#dbeafe'],
+    ['label' => 'Paid',          'value' => $stats['paid'],       'color' => '#6b21a8', 'bg' => '#f3e8ff'],
+  ] as $stat)
+  <div class="panel" style="padding:14px">
+    <p style="font-size:11px;color:var(--muted);margin-bottom:6px">{{ $stat['label'] }}</p>
+    <p style="font-size:24px;font-weight:700;background:{{ $stat['bg'] }};color:{{ $stat['color'] }};display:inline-block;padding:2px 8px;border-radius:6px">
+      {{ $stat['value'] }}
+    </p>
+  </div>
+  @endforeach
 </div>
 
 {{-- Pending alumni queue --}}
-<div class="bg-white rounded-xl border border-gray-200">
-    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-        <h2 class="font-semibold text-gray-700">Pending Approval</h2>
-        <a href="{{ route('admin.alumni.index', ['status' => 'pending']) }}"
-            class="text-xs text-primary hover:underline">View all &rarr;</a>
-    </div>
+<div class="panel" style="padding:0">
+  <div style="padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
+    <h2 style="font-size:15px;font-weight:600;color:var(--ink)">Pending Approval</h2>
+    <a href="{{ route('admin.alumni.index', ['status' => 'pending']) }}"
+      style="font-size:12px;color:var(--red-700);text-decoration:none">View all &rarr;</a>
+  </div>
 
-    @if($pendingAlumni->isEmpty())
-        <p class="px-5 py-6 text-sm text-gray-400">No pending alumni. All caught up!</p>
-    @else
-        <ul class="divide-y divide-gray-100">
-            @foreach($pendingAlumni as $a)
-            <li class="px-5 py-3 flex items-center justify-between gap-4">
-                <div class="min-w-0">
-                    <p class="font-medium text-sm text-gray-800 truncate">{{ $a->name }}</p>
-                    <p class="text-xs text-gray-400">Roll: {{ $a->roll_number }} · {{ $a->email }}</p>
-                </div>
-                <div class="flex gap-2 flex-shrink-0">
-                    <form method="POST" action="{{ route('admin.alumni.verify', $a) }}">
-                        @csrf
-                        <button class="text-xs bg-green-100 text-green-700 font-semibold px-3 py-1 rounded hover:bg-green-200 transition">
-                            Verify
-                        </button>
-                    </form>
-                    <a href="{{ route('admin.alumni.show', $a) }}"
-                        class="text-xs bg-gray-100 text-gray-600 font-semibold px-3 py-1 rounded hover:bg-gray-200 transition">
-                        View
-                    </a>
-                </div>
-            </li>
-            @endforeach
-        </ul>
-    @endif
+  @if($pendingAlumni->isEmpty())
+    <p style="padding:20px;font-size:13px;color:var(--muted)">No pending alumni. All caught up!</p>
+  @else
+    <ul style="list-style:none;padding:0;margin:0">
+      @foreach($pendingAlumni as $a)
+      <li style="padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line)">
+        <div style="min-width:0">
+          <p style="font-size:14px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $a->name }}</p>
+          <p style="font-size:12px;color:var(--muted)">Roll: {{ $a->roll_number }} · {{ $a->email }}</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <form method="POST" action="{{ route('admin.alumni.verify', $a) }}">
+            @csrf
+            <button class="btn btn-sm" style="background:#dcfce7;color:#166534;border-color:#86efac">✓ Verify</button>
+          </form>
+          <a href="{{ route('admin.alumni.show', $a) }}" class="btn btn-ghost btn-sm">View</a>
+        </div>
+      </li>
+      @endforeach
+    </ul>
+  @endif
 </div>
 
 @endsection

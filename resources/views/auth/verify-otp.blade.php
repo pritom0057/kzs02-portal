@@ -1,39 +1,50 @@
-@extends('layouts.app')
-@section('title', 'Verify Email — KZS 2002 Reunion')
+@extends('layouts.auth')
+@section('title', 'ইমেইল যাচাই — কুষ্টিয়া জিলা স্কুল ব্যাচ-২০০২')
 
 @section('content')
-<div class="max-w-md mx-auto">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 text-center">
-        <div class="text-5xl mb-4">📧</div>
-        <h1 class="text-2xl font-bold text-primary mb-1">Check Your Email</h1>
-        <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">
-            We sent a 6-digit code to <strong>{{ session('otp_email') }}</strong>
-        </p>
+<section class="section section-tint">
+  <div class="wrap" style="max-width:520px">
+    <div class="form-card" style="text-align:center">
 
-        <form method="POST" action="{{ route('otp.verify') }}" class="space-y-4">
-            @csrf
+      <div style="width:64px;height:64px;border-radius:20px;background:var(--tint);display:grid;place-items:center;margin:0 auto 20px">
+        <i data-lucide="mail" width="32" height="32" color="var(--red-700)"></i>
+      </div>
 
-            <div>
-                <input type="text" name="otp" maxlength="6" inputmode="numeric" autofocus
-                    class="w-full border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-4 py-3 text-center text-2xl tracking-widest font-bold focus:outline-none focus:border-primary @error('otp') border-red-400 @enderror"
-                    placeholder="000000">
-                @error('otp')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+      <h2 style="font-size:24px;color:var(--red-900);margin-bottom:8px" data-en="Check Your Email">আপনার ইমেইল চেক করুন</h2>
+      <p style="color:var(--muted);margin-bottom:24px;font-size:15px" data-en="We sent a 6-digit code to your email. Enter it below to verify your account.">
+        আমরা আপনার ইমেইলে একটি ৬ সংখ্যার কোড পাঠিয়েছি।
+        @if(session('otp_email'))
+          <br><strong style="color:var(--red-900)">{{ session('otp_email') }}</strong>
+        @endif
+      </p>
 
-            <button type="submit"
-                class="w-full bg-primary text-white font-semibold py-2 rounded-lg hover:bg-opacity-90 transition">
-                Verify Code
-            </button>
-        </form>
+      @if(session('success'))
+        <div class="alert-ok" style="text-align:left">✓ {{ session('success') }}</div>
+      @endif
+      @if(session('error'))
+        <div class="alert-err" style="text-align:left">{{ session('error') }}</div>
+      @endif
 
-        <form method="POST" action="{{ route('otp.resend') }}" class="mt-4">
-            @csrf
-            <button type="submit" class="text-sm text-primary hover:underline">
-                Didn't receive the code? Resend
-            </button>
-        </form>
+      <form method="POST" action="{{ route('otp.verify') }}" class="fields">
+        @csrf
+        <div>
+          <input type="text" name="otp" maxlength="6" inputmode="numeric" autofocus
+                 placeholder="000000"
+                 style="text-align:center;font-size:28px;font-weight:700;letter-spacing:0.3em;font-family:var(--f-display)"
+                 class="{{ $errors->has('otp') ? 'input-err' : '' }}">
+          @error('otp')<p class="field-err" style="text-align:left">{{ $message }}</p>@enderror
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;border-radius:12px" data-en="Verify Code">কোড যাচাই করুন</button>
+      </form>
+
+      <form method="POST" action="{{ route('otp.resend') }}" style="margin-top:16px">
+        @csrf
+        <button type="submit" style="background:none;border:0;color:var(--red-700);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--f-body)" data-en="Didn't receive the code? Resend">
+          কোড পাননি? পুনরায় পাঠান
+        </button>
+      </form>
+
     </div>
-</div>
+  </div>
+</section>
 @endsection

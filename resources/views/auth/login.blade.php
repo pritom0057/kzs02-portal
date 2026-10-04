@@ -1,75 +1,100 @@
 @extends('layouts.auth')
-@section('title', 'Sign In — KZS 2002 Reunion')
+@section('title', 'সদস্য লগইন — কুষ্টিয়া জিলা স্কুল ব্যাচ-২০০২')
 
-@section('form')
+@section('content')
+<section class="section section-tint">
+  <div class="wrap reg">
 
-<h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">Welcome back</h1>
-<p class="text-gray-500 dark:text-gray-400 text-sm mb-7">Sign in to your KZS 2002 Reunion account</p>
-
-<form method="POST" action="{{ route('login') }}" class="space-y-4">
-    @csrf
-
-    {{-- Identifier --}}
-    <div>
-        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
-            Email / Mobile / Roll number <span class="text-brand">*</span>
-        </label>
-        <input type="text" name="identifier" value="{{ old('identifier') }}" required autofocus
-               placeholder="e.g. your@email.com or 01XXXXXXXXX"
-               class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400
-                      focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent
-                      @error('identifier') border-red-400 @enderror">
-        @error('identifier')
-            <p class="text-brand text-xs mt-1">{{ $message }}</p>
-        @enderror
+    {{-- Left: description --}}
+    <div style="min-width:0">
+      <div class="sec-head" style="margin-bottom:0">
+        <span class="eyebrow" data-en="Members">সদস্যদের জন্য</span>
+        <h2 data-en="Member Login">সদস্য লগইন</h2>
+        <p data-en="Sign in to reach the batch wall and your own profile.">ব্যাচ ওয়াল ও নিজের প্রোফাইলে যেতে সাইন ইন করুন।</p>
+      </div>
+      <ul class="perks">
+        <li><span class="tick"><i data-lucide="message-square" width="14" height="14"></i></span><span data-en="Batch Wall: share news and memories, like and comment">ব্যাচ ওয়াল: খবর ও স্মৃতি ভাগ করুন, পছন্দ ও মন্তব্য করুন</span></li>
+        <li><span class="tick"><i data-lucide="user-round" width="14" height="14"></i></span><span data-en="Profile: keep your profession, city and a short intro">প্রোফাইল: পেশা, শহর ও ছোট পরিচিতি রাখুন</span></li>
+        <li><span class="tick"><i data-lucide="users" width="14" height="14"></i></span><span data-en="Find and open the profiles of your batchmates">ব্যাচের বন্ধুদের প্রোফাইল খুঁজে দেখুন</span></li>
+      </ul>
     </div>
 
-    {{-- Password --}}
-    <div>
-        <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Password <span class="text-brand">*</span></label>
-        <div class="relative">
-            <input type="password" name="password" required id="login_password"
-                   placeholder="Your password"
-                   class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400
-                          focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent pr-10
-                          @error('password') border-red-400 @enderror">
-            <button type="button" onclick="togglePwd('login_password')"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-7s4-7 9-7a9.97 9.97 0 016.364 2.273M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"/>
-                </svg>
-            </button>
+    {{-- Right: form card --}}
+    <div class="form-card">
+      <h3 data-en="Sign In">সাইন ইন করুন</h3>
+      <p class="sub" data-en="Enter your credentials to access your account">আপনার অ্যাকাউন্টে প্রবেশ করতে তথ্য দিন</p>
+
+      @if(session('success'))
+        <div class="alert-ok">✓ {{ session('success') }}</div>
+      @endif
+      @if(session('error'))
+        <div class="alert-err">{{ session('error') }}</div>
+      @endif
+
+      <form method="POST" action="{{ route('login') }}" class="fields">
+        @csrf
+
+        <div>
+          <label for="identifier" data-en="Email / Mobile / Roll number">ইমেইল / মোবাইল / রোল নম্বর</label>
+          <input type="text" id="identifier" name="identifier" value="{{ old('identifier') }}"
+                 required autofocus autocomplete="username"
+                 placeholder="your@email.com বা 01XXXXXXXXX"
+                 class="{{ $errors->has('identifier') ? 'input-err' : '' }}">
+          @error('identifier')
+            <p class="field-err">{{ $message }}</p>
+          @enderror
         </div>
-        @error('password')
-            <p class="text-brand text-xs mt-1">{{ $message }}</p>
-        @enderror
+
+        <div>
+          <label for="password" data-en="Password">পাসওয়ার্ড</label>
+          <div style="position:relative">
+            <input type="password" id="password" name="password" required
+                   autocomplete="current-password"
+                   placeholder="আপনার পাসওয়ার্ড"
+                   style="padding-right:44px"
+                   class="{{ $errors->has('password') ? 'input-err' : '' }}">
+            <button type="button" onclick="togglePwd()" title="Show/hide password"
+                    style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:0;cursor:pointer;color:var(--muted);display:flex;align-items:center">
+              <i data-lucide="eye" width="18" height="18" id="eye-icon"></i>
+            </button>
+          </div>
+          @error('password')
+            <p class="field-err">{{ $message }}</p>
+          @enderror
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="remember" name="remember"
+                 style="width:auto;accent-color:var(--red-700);cursor:pointer">
+          <label for="remember" style="margin-bottom:0;font-weight:400;color:var(--muted);cursor:pointer" data-en="Remember me">মনে রাখুন</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;border-radius:12px" data-en="Sign In">সাইন ইন করুন</button>
+      </form>
+
+      <p style="text-align:center;font-size:14px;color:var(--muted);margin-top:18px">
+        <span data-en="New alumni?">নতুন সদস্য?</span>
+        <a href="{{ route('register') }}" style="color:var(--red-700);font-weight:600;text-decoration:none" data-en="Create an account">অ্যাকাউন্ট তৈরি করুন</a>
+      </p>
     </div>
 
-    {{-- Remember me --}}
-    <div class="flex items-center gap-2">
-        <input type="checkbox" name="remember" id="remember"
-               class="rounded border-gray-300 accent-indigo-500 cursor-pointer">
-        <label for="remember" class="text-sm text-gray-600 dark:text-gray-400 cursor-pointer select-none">Remember me</label>
-    </div>
+  </div>
+</section>
+@endsection
 
-    <button type="submit"
-            class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2.5 rounded-lg transition text-sm">
-        Sign in
-    </button>
-</form>
-
-<p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-5">
-    New alumni?
-    <a href="{{ route('register') }}" class="text-indigo-600 font-medium hover:underline">Create an account</a>
-</p>
-
+@push('scripts')
 <script>
-function togglePwd(id) {
-    const input = document.getElementById(id);
-    input.type = input.type === 'password' ? 'text' : 'password';
+function togglePwd() {
+  var inp = document.getElementById('password');
+  var ico = document.getElementById('eye-icon');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    ico.setAttribute('data-lucide', 'eye-off');
+  } else {
+    inp.type = 'password';
+    ico.setAttribute('data-lucide', 'eye');
+  }
+  if (window.lucide) lucide.createIcons();
 }
 </script>
-
-@endsection
+@endpush
