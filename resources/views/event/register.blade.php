@@ -565,7 +565,7 @@
     <div class="panel" style="display:grid;gap:16px">
       <div>
         <p style="font-weight:600;color:var(--ink);font-size:14px;margin-bottom:4px">
-          💳 {{ $paidAmount > 0 ? 'অতিরিক্ত পেমেন্ট' : 'পেমেন্ট প্রয়োজন' }} — ৳{{ number_format($balanceDue, 0) }}
+          💳 <span data-en="{{ $paidAmount > 0 ? 'Additional Payment' : 'Payment Required' }} — ৳{{ number_format($balanceDue, 0) }}">{{ $paidAmount > 0 ? 'অতিরিক্ত পেমেন্ট' : 'পেমেন্ট প্রয়োজন' }} — ৳{{ number_format($balanceDue, 0) }}</span>
         </p>
         <p style="color:var(--muted);font-size:12px" data-en="Choose your preferred payment method below.">নিচে আপনার পছন্দের পেমেন্ট পদ্ধতি বেছে নিন।</p>
       </div>
@@ -587,10 +587,10 @@
       {{-- bKash --}}
       <div id="tab-bkash" class="pay-panel" style="background:var(--tint);border-radius:10px;padding:16px;border:1px solid var(--line);display:grid;gap:12px">
         <div style="font-size:12px;color:var(--muted);background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--line);display:grid;gap:6px">
-          <p>1. <strong>bKash App</strong> খুলুন বা <strong>*247#</strong> ডায়াল করুন</p>
+          <p data-en="1. Open bKash App or dial *247#">1. <strong>bKash App</strong> খুলুন বা <strong>*247#</strong> ডায়াল করুন</p>
           <p>2. <strong>"Send Money"</strong> → <strong style="color:#E2136E;font-family:monospace">+880 1711-740273</strong></p>
-          <p>3. পরিমাণ: <strong style="color:var(--red-700)">৳ {{ number_format($balanceDue, 0) }}</strong></p>
-          <p>4. রেফারেন্স: আপনার <strong>নাম বা ফোন নম্বর</strong></p>
+          <p>3. <span data-en="Amount:">পরিমাণ:</span> <strong style="color:var(--red-700)">৳ {{ number_format($balanceDue + 40, 0) }}</strong> <span style="font-size:10px;color:var(--muted)">(includes ৳40 cashout charge)</span></p>
+          <p data-en="4. Reference: your name or phone number">4. রেফারেন্স: আপনার <strong>নাম বা ফোন নম্বর</strong></p>
         </div>
         <form method="POST" action="{{ route('payment.manual') }}" style="display:grid;gap:10px">
           @csrf
@@ -610,23 +610,23 @@
       {{-- Rocket --}}
       <div id="tab-rocket" class="pay-panel" style="background:var(--tint);border-radius:10px;padding:16px;border:1px solid var(--line);display:none;gap:12px">
         <div style="font-size:12px;color:var(--muted);background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--line);display:grid;gap:6px">
-          <p>1. <strong>Rocket App</strong> খুলুন বা <strong>*322#</strong> ডায়াল করুন</p>
+          <p data-en="1. Open Rocket App or dial *322#">1. <strong>Rocket App</strong> খুলুন বা <strong>*322#</strong> ডায়াল করুন</p>
           <p>2. <strong>"Send Money"</strong> → <strong style="color:#8B1A8B;font-family:monospace">+880 1711-740273</strong></p>
-          <p>3. পরিমাণ: <strong style="color:var(--red-700)">৳ {{ number_format($balanceDue, 0) }}</strong></p>
-          <p>4. রেফারেন্স: আপনার <strong>নাম বা ফোন নম্বর</strong></p>
+          <p>3. <span data-en="Amount:">পরিমাণ:</span> <strong style="color:var(--red-700)">৳ {{ number_format($balanceDue, 0) }}</strong></p>
+          <p data-en="4. Reference: your name or phone number">4. রেফারেন্স: আপনার <strong>নাম বা ফোন নম্বর</strong></p>
         </div>
         <form method="POST" action="{{ route('payment.manual') }}" style="display:grid;gap:10px">
           @csrf
           <input type="hidden" name="payment_method" value="rocket">
           <div>
-            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">প্রেরকের Rocket নম্বর <span style="color:var(--red-700)">*</span></label>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px" data-en="Sender Rocket Mobile *">প্রেরকের Rocket নম্বর <span style="color:var(--red-700)">*</span></label>
             <input type="tel" name="sender_number" placeholder="01XXXXXXXXX">
           </div>
           <div>
-            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">Rocket ট্রানজেকশন ID <span style="color:var(--red-700)">*</span></label>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px" data-en="Rocket Transaction ID *">Rocket ট্রানজেকশন ID <span style="color:var(--red-700)">*</span></label>
             <input type="text" name="payment_reference" required placeholder="e.g. TXN1234567890" style="font-family:monospace;text-transform:uppercase">
           </div>
-          <button type="submit" style="width:100%;padding:10px;border-radius:10px;color:#fff;font-weight:700;font-size:13px;border:none;cursor:pointer;background:#8B1A8B">Rocket পেমেন্ট নিশ্চিত করুন</button>
+          <button type="submit" style="width:100%;padding:10px;border-radius:10px;color:#fff;font-weight:700;font-size:13px;border:none;cursor:pointer;background:#8B1A8B" data-en="Verify & Confirm Rocket Payment">Rocket পেমেন্ট নিশ্চিত করুন</button>
         </form>
       </div>
     </div>

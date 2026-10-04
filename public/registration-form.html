@@ -476,7 +476,7 @@
         <div class="text-xs text-gray-600 bg-white rounded-lg p-3 border border-gray-100 space-y-1.5">
           <p>1. Open <strong>bKash App</strong> or dial <strong>*247#</strong></p>
           <p>2. Select <strong>"Send Money"</strong> → <strong class="text-bkash font-mono">01712-345678</strong></p>
-          <p>3. Amount: <strong class="text-primary" id="bkashAmountNote">৳ 2,000</strong></p>
+          <p>3. Amount: <strong class="text-primary" id="bkashAmountNote">৳ 2,042</strong> <span class="text-gray-400">(includes ৳40 cashout charge)</span></p>
           <p>4. Reference: <strong class="font-mono text-kgray" id="bkashRefNote">KZS02-SJ-XXXX</strong></p>
         </div>
         <div><label class="block text-xs font-semibold text-gray-600 mb-1">Sender bKash Mobile <span class="text-brand">*</span></label>
@@ -721,7 +721,7 @@
     document.getElementById('modalRegIdDisplay').textContent = uniqueRegId;
     document.getElementById('modalApplicantName').textContent = document.getElementById('applicantNameEn').value;
     document.getElementById('modalAmountDisplay').textContent = `৳ ${currentTotal.toLocaleString()}`;
-    document.getElementById('bkashAmountNote').textContent = `৳ ${currentTotal.toLocaleString()}`;
+    document.getElementById('bkashAmountNote').innerHTML = `৳ ${(currentTotal + 40).toLocaleString()} <span class="text-gray-400">(includes ৳40 cashout charge)</span>`;
     document.getElementById('nagadAmountNote').textContent = `৳ ${currentTotal.toLocaleString()}`;
     document.getElementById('bkashRefNote').textContent = uniqueRegId;
     document.getElementById('nagadRefNote').textContent = uniqueRegId;
