@@ -582,6 +582,11 @@
           <span style="font-size:13px;font-weight:800;display:block;color:#8B1A8B">Rocket</span>
           <span style="font-size:10px;color:var(--muted)">Send Money</span>
         </button>
+        <button type="button" class="pay-tab" data-tab="bank"
+          style="padding:10px 4px;border-radius:10px;border:2px solid var(--line);background:transparent;text-align:center;cursor:pointer">
+          <span style="font-size:13px;font-weight:800;display:block;color:#1a56a4">MTB</span>
+          <span style="font-size:10px;color:var(--muted)">Bank Transfer</span>
+        </button>
       </div>
 
       {{-- bKash --}}
@@ -627,6 +632,32 @@
             <input type="text" name="payment_reference" required placeholder="e.g. TXN1234567890" style="font-family:monospace;text-transform:uppercase">
           </div>
           <button type="submit" style="width:100%;padding:10px;border-radius:10px;color:#fff;font-weight:700;font-size:13px;border:none;cursor:pointer;background:#8B1A8B" data-en="Verify & Confirm Rocket Payment">Rocket পেমেন্ট নিশ্চিত করুন</button>
+        </form>
+      </div>
+
+      {{-- MTB Bank Transfer --}}
+      <div id="tab-bank" class="pay-panel" style="background:var(--tint);border-radius:10px;padding:16px;border:1px solid var(--line);display:none;gap:12px">
+        <div style="font-size:12px;color:var(--muted);background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--line);display:grid;gap:6px">
+          <p data-en="Transfer the amount to the following bank account:">নিচের ব্যাংক একাউন্টে পরিমাণ ট্রান্সফার করুন:</p>
+          <p><span data-en="Bank:">ব্যাংক:</span> <strong>Mutual Trust Bank PLC</strong></p>
+          <p><span data-en="Branch:">শাখা:</span> <strong>Kushtia Branch</strong></p>
+          <p><span data-en="Account Name:">একাউন্টের নাম:</span> <strong>Kushtia Zilla School Batch-2002</strong></p>
+          <p><span data-en="Account No:">একাউন্ট নম্বর:</span> <strong style="font-family:monospace;color:#1a56a4">1301000717275</strong></p>
+          <p><span data-en="Amount:">পরিমাণ:</span> <strong style="color:var(--red-700)">৳ {{ number_format($balanceDue, 0) }}</strong></p>
+          <p data-en="4. Reference: your name or phone number">4. রেফারেন্স: আপনার <strong>নাম বা ফোন নম্বর</strong></p>
+        </div>
+        <form method="POST" action="{{ route('payment.manual') }}" style="display:grid;gap:10px">
+          @csrf
+          <input type="hidden" name="payment_method" value="bank">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px" data-en="Depositor Name / Reference *">জমাদানকারীর নাম / রেফারেন্স <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="sender_number" placeholder="আপনার নাম">
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px" data-en="Bank Transaction / Deposit Slip No. *">ট্রানজেকশন / ডিপোজিট স্লিপ নম্বর <span style="color:var(--red-700)">*</span></label>
+            <input type="text" name="payment_reference" required placeholder="e.g. TXN1234567890" style="font-family:monospace;text-transform:uppercase">
+          </div>
+          <button type="submit" style="width:100%;padding:10px;border-radius:10px;color:#fff;font-weight:700;font-size:13px;border:none;cursor:pointer;background:#1a56a4" data-en="Verify & Confirm Bank Transfer">ব্যাংক ট্রান্সফার নিশ্চিত করুন</button>
         </form>
       </div>
     </div>
