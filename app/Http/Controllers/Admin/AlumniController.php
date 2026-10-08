@@ -111,6 +111,39 @@ class AlumniController extends Controller
         return back()->with('success', "{$alumnus->name}'s payment reset to unpaid.");
     }
 
+    public function cancelPayment(Request $request, Alumni $alumnus)
+    {
+        $request->validate(['reason' => 'required|string|max:300']);
+
+        $reg = $alumnus->eventRegistration;
+        if (!$reg) return back()->with('error', 'No event registration found.');
+
+        if ($reg->payment_status !== 'pending') {
+            return back()->with('error', 'Payment is not in pending state — cannot cancel.');
+        }
+
+        $prevRef    = $reg->payment_reference;
+        $prevMethod = $reg->payment_method;
+
+        $reg->update([
+            'payment_status'    => 'unpaid',
+            'payment_reference' => null,
+            'payment_method'    => null,
+        ]);
+
+        PaymentLog::create([
+            'alumni_id' => $alumnus->id,
+            'type'      => 'cancelled',
+            'amount'    => 0,
+            'method'    => $prevMethod,
+            'reference' => $prevRef,
+            'note'      => "Payment cancelled by admin. Method: " . strtoupper($prevMethod ?? 'manual') . ". Ref: {$prevRef}. Reason: {$request->reason}",
+            'actor'     => auth()->user()->name,
+        ]);
+
+        return back()->with('success', "{$alumnus->name}'s pending payment has been cancelled.");
+    }
+
     public function adjustPayment(Alumni $alumnus)
     {
         $reg = $alumnus->eventRegistration;

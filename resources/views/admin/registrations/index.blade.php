@@ -115,16 +115,35 @@
             $needsConfirm = $balanceDue > 0 || $reg->payment_status === 'pending';
           @endphp
           @if($needsConfirm)
-          <form method="POST" action="{{ route('admin.alumni.payment.confirm', $reg->alumni) }}">
-            @csrf
-            <button class="btn btn-sm" style="background:#dcfce7;color:#166534;border-color:#86efac;white-space:nowrap">
-              @if($reg->paid_amount > 0 && $balanceDue > 0)
-                ✓ +৳{{ number_format($balanceDue) }}
-              @else
-                ✓ Confirm
-              @endif
-            </button>
-          </form>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <form method="POST" action="{{ route('admin.alumni.payment.confirm', $reg->alumni) }}">
+              @csrf
+              <button class="btn btn-sm" style="background:#dcfce7;color:#166534;border-color:#86efac;white-space:nowrap;width:100%">
+                @if($reg->paid_amount > 0 && $balanceDue > 0)
+                  ✓ +৳{{ number_format($balanceDue) }}
+                @else
+                  ✓ Confirm
+                @endif
+              </button>
+            </form>
+            @if($reg->payment_status === 'pending')
+            <button type="button" class="btn btn-sm"
+              style="background:#fee2e2;color:#991b1b;border-color:#fca5a5;white-space:nowrap;width:100%"
+              onclick="
+                var reason = prompt('Reason for cancelling this payment:');
+                if (reason && reason.trim()) {
+                  var f = document.getElementById('cancel-form-{{ $reg->alumni->id }}');
+                  f.querySelector('[name=reason]').value = reason.trim();
+                  f.submit();
+                }
+              ">✕ Cancel</button>
+            <form id="cancel-form-{{ $reg->alumni->id }}" method="POST"
+              action="{{ route('admin.alumni.payment.cancel', $reg->alumni) }}" style="display:none">
+              @csrf
+              <input type="hidden" name="reason" value="">
+            </form>
+            @endif
+          </div>
           @elseif($reg->paid_amount > $reg->total_amount)
           <form method="POST" action="{{ route('admin.alumni.payment.adjust', $reg->alumni) }}">
             @csrf

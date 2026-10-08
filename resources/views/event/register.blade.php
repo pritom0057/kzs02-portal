@@ -549,6 +549,23 @@
       @endif
     </div>
     @elseif($needsMore)
+    @if(isset($cancelledLog) && $cancelledLog)
+    @php
+      // Extract just the reason from the log note
+      $cancelReason = $cancelledLog->note;
+      if (preg_match('/Reason:\s*(.+)$/i', $cancelledLog->note, $m)) {
+        $cancelReason = $m[1];
+      }
+    @endphp
+    <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:12px">
+      <span style="font-size:22px;margin-top:2px">❌</span>
+      <div>
+        <p style="font-weight:700;color:#991b1b;font-size:13px" data-en="Payment Cancelled by Admin">অ্যাডমিন আপনার পেমেন্ট বাতিল করেছেন</p>
+        <p style="color:#b91c1c;font-size:12px;margin-top:4px"><strong data-en="Reason:">কারণ:</strong> {{ $cancelReason }}</p>
+        <p style="color:#b91c1c;font-size:11px;margin-top:4px" data-en="Please resubmit your payment below with correct details.">সঠিক তথ্য দিয়ে নিচে আবার পেমেন্ট জমা দিন।</p>
+      </div>
+    </div>
+    @endif
     @if($paidAmount > 0)
     <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px">
       <span style="font-size:18px;margin-top:2px">⚠️</span>

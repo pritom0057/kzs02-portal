@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EventRegistration;
+use App\Models\PaymentLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,7 +14,14 @@ class EventRegistrationController extends Controller
         $alumni       = auth()->user();
         $registration = $alumni->eventRegistration;
 
-        return view('event.register', compact('alumni', 'registration'));
+        $cancelledLog = $registration
+            ? PaymentLog::where('alumni_id', $alumni->id)
+                ->where('type', 'cancelled')
+                ->latest()
+                ->first()
+            : null;
+
+        return view('event.register', compact('alumni', 'registration', 'cancelledLog'));
     }
 
     public function save(Request $request)

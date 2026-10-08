@@ -207,6 +207,22 @@
             @endif
           </button>
         </form>
+        @if($reg->payment_status === 'pending')
+        <div style="margin-top:4px;padding-top:10px;border-top:1px solid var(--line)">
+          <p style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Cancel Payment Request</p>
+          <form method="POST" action="{{ route('admin.alumni.payment.cancel', $alumnus) }}" style="display:grid;gap:8px"
+            onsubmit="return confirm('Cancel this pending payment? The member will need to resubmit.')">
+            @csrf
+            <input type="text" name="reason" required maxlength="300"
+              placeholder="Reason for cancellation…"
+              style="font-size:12px">
+            <button type="submit" class="btn btn-sm"
+              style="width:100%;justify-content:center;background:#fee2e2;color:#991b1b;border-color:#fca5a5">
+              ✕ Cancel Payment Request
+            </button>
+          </form>
+        </div>
+        @endif
         @endif
       </div>
     </div>
@@ -234,6 +250,7 @@
             'submitted'                 => ['⏳', 'badge-blue'],
             'reset'                     => ['↺', 'badge-yellow'],
             'adjusted'                  => ['⇅', 'badge-yellow'],
+            'cancelled'                 => ['✕', 'badge-red'],
             default                     => ['·', 'badge-gray'],
           };
         @endphp

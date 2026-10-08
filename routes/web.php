@@ -116,6 +116,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/notes/{note}', [AlumniController::class, 'destroyNote'])->name('notes.destroy');
 
     Route::post('/alumni/{alumnus}/payment/confirm', [AlumniController::class, 'confirmPayment'])->name('alumni.payment.confirm');
+    Route::post('/alumni/{alumnus}/payment/cancel', [AlumniController::class, 'cancelPayment'])->name('alumni.payment.cancel');
     Route::post('/alumni/{alumnus}/payment/reset', [AlumniController::class, 'resetPayment'])->name('alumni.payment.reset');
     Route::post('/alumni/{alumnus}/payment/adjust', [AlumniController::class, 'adjustPayment'])->name('alumni.payment.adjust');
 
