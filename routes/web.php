@@ -5,9 +5,11 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExportController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\TransactionController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DirectoryController;
 use App\Http\Controllers\EventRegistrationController;
@@ -38,6 +40,13 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])
         ->middleware('throttle:5,1');
+
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'send'])->name('password.email')
+        ->middleware('throttle:3,1');
+
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showForm'])->name('password.reset');
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 
     Route::get('/verify-otp', [OtpController::class, 'showForm'])->name('otp.form');
     Route::post('/verify-otp', [OtpController::class, 'verify'])->name('otp.verify')
@@ -119,6 +128,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/alumni/{alumnus}/payment/cancel', [AlumniController::class, 'cancelPayment'])->name('alumni.payment.cancel');
     Route::post('/alumni/{alumnus}/payment/reset', [AlumniController::class, 'resetPayment'])->name('alumni.payment.reset');
     Route::post('/alumni/{alumnus}/payment/adjust', [AlumniController::class, 'adjustPayment'])->name('alumni.payment.adjust');
+
+    Route::get('/alumni/{alumnus}/invoice', [AlumniController::class, 'downloadInvoice'])->name('alumni.invoice');
+    Route::post('/alumni/{alumnus}/invoice/send', [AlumniController::class, 'sendInvoice'])->name('alumni.invoice.send');
 
     Route::get('/registrations', [RegistrationController::class, 'index'])->name('registrations.index');
 

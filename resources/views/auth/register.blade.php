@@ -59,7 +59,7 @@
             <input type="tel" id="mobile" name="mobile" value="{{ old('mobile') }}"
                    placeholder="01XXXXXXXXX">
           </div>
-          <div style="min-width:0">
+          <div style="min-width:0;display:none">
             <label for="roll_number" data-en="Roll / Section (school days)">রোল / সেকশন (স্কুল জীবন)</label>
             <input type="text" id="roll_number" name="roll_number" value="{{ old('roll_number') }}"
                    placeholder="যেমন: সেকশন এ, রোল ১২"

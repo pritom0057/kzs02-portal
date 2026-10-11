@@ -62,6 +62,7 @@ class EventRegistrationController extends Controller
             'perm_district'         => 'required|string|max:100',
             'passport_photo'        => 'nullable|image|max:3072',
             'family_photo'          => 'nullable|image|max:5120',
+            'roll_number'           => 'nullable|string|max:20',
         ]);
 
         $alumni = auth()->user();
@@ -122,6 +123,7 @@ class EventRegistrationController extends Controller
             'photo_url'         => $passportUrl,
             'family_photo_url'  => $familyPhotoUrl,
             'spouse_name'       => $request->spouse_name,
+            'roll_number'       => $request->roll_number,
         ]);
 
         // Calculate totals

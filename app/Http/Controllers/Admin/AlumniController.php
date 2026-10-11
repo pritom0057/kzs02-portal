@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PaymentConfirmed;
 use App\Models\AdminNote;
 use App\Models\Alumni;
 use App\Models\PaymentLog;
 use App\Models\PaymentTransaction;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class AlumniController extends Controller
 {
@@ -84,6 +87,17 @@ class AlumniController extends Controller
             'note'      => "{$label} — ৳" . number_format(max(0, $amountConfirmed)) . " via " . strtoupper($reg->payment_method ?? 'manual') . ". Total paid: ৳" . number_format($reg->total_amount),
             'actor'     => $admin,
         ]);
+
+        try {
+            Mail::to($alumnus->email)->send(new PaymentConfirmed(
+                alumnus:         $alumnus,
+                registration:    $reg->fresh(),
+                amountConfirmed: max(0, $amountConfirmed),
+                isAdditional:    $previouslyPaid > 0,
+            ));
+        } catch (\Throwable $e) {
+            \Log::error('PaymentConfirmed mail failed: ' . $e->getMessage() . ' | ' . $e->getFile() . ':' . $e->getLine());
+        }
 
         return back()->with('success', "{$alumnus->name}'s payment confirmed — ৳" . number_format($reg->total_amount) . " fully paid.");
     }
@@ -192,5 +206,41 @@ class AlumniController extends Controller
         $note->delete();
 
         return back()->with('success', 'Note deleted.');
+    }
+
+    public function downloadInvoice(Alumni $alumnus)
+    {
+        $reg = $alumnus->eventRegistration;
+        if (!$reg) return back()->with('error', 'No registration found.');
+
+        $invoiceNo = 'KZS2002-' . str_pad($reg->id, 5, '0', STR_PAD_LEFT);
+
+        $pdf = Pdf::loadView('pdf.invoice', [
+            'alumnus'         => $alumnus,
+            'registration'    => $reg,
+            'amountConfirmed' => $reg->paid_amount,
+            'isAdditional'    => false,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download($invoiceNo . '.pdf');
+    }
+
+    public function sendInvoice(Alumni $alumnus)
+    {
+        $reg = $alumnus->eventRegistration;
+        if (!$reg) return back()->with('error', 'No registration found.');
+
+        try {
+            Mail::to($alumnus->email)->send(new PaymentConfirmed(
+                alumnus:         $alumnus,
+                registration:    $reg,
+                amountConfirmed: $reg->paid_amount,
+                isAdditional:    false,
+            ));
+            return back()->with('success', "Invoice sent to {$alumnus->email}.");
+        } catch (\Throwable $e) {
+            \Log::error('sendInvoice failed: ' . $e->getMessage());
+            return back()->with('error', 'Failed to send invoice. Check server logs.');
+        }
     }
 }

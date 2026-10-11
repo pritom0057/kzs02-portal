@@ -190,6 +190,16 @@
           </button>
         </form>
         @elseif($fullyPaid)
+        <form method="POST" action="{{ route('admin.alumni.invoice.send', $alumnus) }}">
+          @csrf
+          <button onclick="return confirm('Send invoice email to {{ $alumnus->email }}?')" class="btn btn-sm" style="width:100%;justify-content:center;background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe">
+            ✉ Send Invoice to {{ $alumnus->email }}
+          </button>
+        </form>
+        <a href="{{ route('admin.alumni.invoice', $alumnus) }}" target="_blank"
+          class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;text-decoration:none">
+          ↓ Download Invoice PDF
+        </a>
         <form method="POST" action="{{ route('admin.alumni.payment.reset', $alumnus) }}">
           @csrf
           <button onclick="return confirm('Reset payment to unpaid?')" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center">

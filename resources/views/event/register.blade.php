@@ -79,6 +79,12 @@
             <option value="A" {{ old('school_section', $alumni->section) === 'A' ? 'selected' : '' }}>Section A</option>
           </select>
         </div>
+        <div>
+          <label style="display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px" data-en="Roll / Section (optional)">রোল / সেকশন (ঐচ্ছিক)</label>
+          <input type="text" name="roll_number" value="{{ old('roll_number', $alumni->roll_number) }}"
+            placeholder="যেমন: সেকশন এ, রোল ১২"
+            data-en-ph="e.g. Section A, Roll 12">
+        </div>
       </div>
     </div>
 
@@ -665,7 +671,7 @@
         </div>
         <form method="POST" action="{{ route('payment.manual') }}" style="display:grid;gap:10px">
           @csrf
-          <input type="hidden" name="payment_method" value="bank">
+          <input type="hidden" name="payment_method" value="bank_transfer">
           <div>
             <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px" data-en="Depositor Name / Reference *">জমাদানকারীর নাম / রেফারেন্স <span style="color:var(--red-700)">*</span></label>
             <input type="text" name="sender_number" placeholder="আপনার নাম">

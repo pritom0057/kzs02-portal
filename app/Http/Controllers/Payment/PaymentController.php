@@ -37,7 +37,7 @@ class PaymentController extends Controller
     public function manual(Request $request)
     {
         $request->validate([
-            'payment_method'    => 'required|in:bkash,nagad,bank_transfer',
+            'payment_method'    => 'required|in:bkash,nagad,rocket,bank_transfer',
             'sender_number'     => 'nullable|string|max:20',
             'payment_reference' => 'required|string|max:100',
         ]);

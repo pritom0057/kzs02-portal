@@ -72,6 +72,10 @@
         <button type="submit" class="btn btn-primary" style="width:100%;border-radius:12px" data-en="Sign In">সাইন ইন করুন</button>
       </form>
 
+      <p style="text-align:center;font-size:13px;margin-top:12px">
+        <a href="{{ route('password.request') }}" style="color:var(--red-700);text-decoration:none" data-en="Forgot your password?">পাসওয়ার্ড ভুলে গেছেন?</a>
+      </p>
+
       <p style="text-align:center;font-size:14px;color:var(--muted);margin-top:18px">
         <span data-en="New alumni?">নতুন সদস্য?</span>
         <a href="{{ route('register') }}" style="color:var(--red-700);font-weight:600;text-decoration:none" data-en="Create an account">অ্যাকাউন্ট তৈরি করুন</a>

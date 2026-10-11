@@ -24,8 +24,13 @@
     });
   }
 
+  function syncCookie(lang) {
+    document.cookie = LANG_KEY + '=' + lang + '; path=/; max-age=31536000; SameSite=Lax';
+  }
+
   function setLang(lang) {
     localStorage.setItem(LANG_KEY, lang);
+    syncCookie(lang);
     applyLang(lang);
     /* persist to backend if logged in */
     var csrf = document.querySelector('meta[name="csrf-token"]');
@@ -40,7 +45,9 @@
 
   /* wire buttons */
   document.addEventListener('DOMContentLoaded', function () {
-    applyLang(getLang());
+    var lang = getLang();
+    syncCookie(lang); /* keep cookie in sync with localStorage on every page load */
+    applyLang(lang);
     document.querySelectorAll('.lang-btn[data-lang]').forEach(function (btn) {
       btn.addEventListener('click', function () { setLang(btn.getAttribute('data-lang')); });
     });

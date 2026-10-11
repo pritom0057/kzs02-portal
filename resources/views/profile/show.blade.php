@@ -44,6 +44,8 @@
           ['label' => 'মোবাইল', 'en' => 'Mobile', 'val' => $alumni->mobile ?: ($alumni->phone ?: '—')],
           ['label' => 'জরুরি যোগাযোগ', 'en' => 'Emergency Contact', 'val' => $alumni->emergency_contact ?? null],
           ['label' => 'WhatsApp', 'en' => 'WhatsApp', 'val' => $alumni->whatsapp ?? null],
+          ['label' => 'বাবার নাম', 'en' => "Father's Name", 'val' => $alumni->father_name ?? null],
+          ['label' => 'মায়ের নাম', 'en' => "Mother's Name", 'val' => $alumni->mother_name ?? null],
           ['label' => 'স্ত্রী/স্বামী', 'en' => 'Spouse', 'val' => $alumni->spouse_name ?: '—'],
           ['label' => 'বর্তমান ঠিকানা', 'en' => 'Present Address', 'val' => $alumni->present_address ?: '—'],
           ['label' => 'পেশা', 'en' => 'Profession', 'val' => $alumni->current_profession ?: '—'],
