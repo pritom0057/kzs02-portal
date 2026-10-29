@@ -78,9 +78,20 @@
     @php
       function parseAddrProfile(string $addr): array {
         $p = ['road'=>'','post'=>'','thana'=>'','postcode'=>'','district'=>''];
-        if (preg_match('/^(.*?),\s*PO:\s*(.*?),\s*(.*?),\s*(?:PC:|Upazilla?:)\s*(.*?),\s*(.*)$/', $addr, $m)) {
-          $p = ['road'=>trim($m[1]),'post'=>trim($m[2]),'thana'=>trim($m[3]),'postcode'=>trim($m[4]),'district'=>trim($m[5])];
+        if (!$addr) return $p;
+        $rem = $addr;
+        if (preg_match('/PO:\s*([^,]+)/', $rem, $m)) {
+          $p['post'] = trim($m[1]);
+          $rem = preg_replace('/,?\s*PO:\s*[^,]+/', '', $rem);
         }
+        if (preg_match('/(?:PC:|Upazilla?:)\s*([^,]+)/', $rem, $m)) {
+          $p['postcode'] = trim($m[1]);
+          $rem = preg_replace('/,?\s*(?:PC:|Upazilla?:)\s*[^,]+/', '', $rem);
+        }
+        $parts = array_values(array_filter(array_map('trim', explode(',', $rem))));
+        if (count($parts) >= 3)      { $p['road'] = $parts[0]; $p['thana'] = $parts[1]; $p['district'] = $parts[count($parts)-1]; }
+        elseif (count($parts) === 2) { $p['road'] = $parts[0]; $p['district'] = $parts[1]; }
+        elseif (count($parts) === 1) { $p['district'] = $parts[0]; }
         return $p;
       }
       $pres = parseAddrProfile($alumni->present_address ?? '');
